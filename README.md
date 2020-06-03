@@ -1,0 +1,1 @@
+# Canducci.MongoDB.Repository
