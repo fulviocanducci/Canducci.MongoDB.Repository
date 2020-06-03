@@ -1,0 +1,12 @@
+language: csharp
+mono: none
+dotnet: 3.1.100
+solution: Canducci.MongoDB.Repository.sln
+addons:
+  apt:
+    packages:
+    - libc6-dev
+    - libgdiplus    
+script:
+  - dotnet restore
+  - dotnet test -c Release -f netcoreapp3.1
