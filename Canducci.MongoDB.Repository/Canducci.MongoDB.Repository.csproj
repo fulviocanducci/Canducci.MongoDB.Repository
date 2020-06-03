@@ -2,6 +2,16 @@
 
   <PropertyGroup>
     <TargetFrameworks>net452;netstandard1.5;netstandard2.0</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>fulviocanducci</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>repository mongodb</PackageTags>
+    <PackageReleaseNotes>v1.0.0</PackageReleaseNotes>
+    <PackageIcon>mongo.png</PackageIcon>
+    <Description>Repository MongoDB</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +34,13 @@
     <PackageReference Include="Microsoft.Extensions.Configuration">
       <Version>3.1.4</Version>
     </PackageReference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="..\images\mongo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
