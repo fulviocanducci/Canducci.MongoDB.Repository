@@ -11,17 +11,23 @@ using System.Threading.Tasks;
 
 namespace Canducci.MongoDB.Repository
 {
-    public abstract class Repository<T> : IRepository<T>
-        where T : class, new()
+    public abstract class Repository<T> : IRepository<T> where T : class, new()
     {
+        #region protected
         protected IConnect Connect { get; private set; }
         protected IMongoCollection<T> Collection { get; private set; }
         protected string CollectionName { get; private set; }
+        #endregion
 
+        #region construct
         public Repository(IConnect connect)
+            :this (connect, null)
+        { }
+        public Repository(IConnect connect, MongoCollectionSettings mongoCollectionSettings)
         {
-            SetConnectAndCollection(connect);
+            SetConnectAndCollection(connect, mongoCollectionSettings);
         }
+        #endregion
 
         #region add 
 
@@ -231,14 +237,12 @@ namespace Canducci.MongoDB.Repository
                 ? bsonCollectionName.Name
                 : typeof(T).Name.ToLower();
         }
-
-        internal void SetConnectAndCollection(IConnect connect)
+        internal void SetConnectAndCollection(IConnect connect, MongoCollectionSettings mongoCollectionSettings)
         {
             SetCollectionName();
             Connect = connect;
-            Collection = Connect.Collection<T>(CollectionName);
+            Collection = Connect.Collection<T>(CollectionName, mongoCollectionSettings);
         }
         #endregion                    
-
     }
 }
