@@ -1,4 +1,5 @@
 ﻿using Canducci.MongoDB.Repository.Attributes;
+using Canducci.MongoDB.Repository.Paged;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -15,8 +16,11 @@ namespace Canducci.MongoDB.Repository
     {
         #region protected
         protected IConnect Connect { get; private set; }
-        protected IMongoCollection<T> Collection { get; private set; }
         protected string CollectionName { get; private set; }
+        #endregion
+
+        #region public
+        public IMongoCollection<T> Collection { get; private set; }
         #endregion
 
         #region construct
@@ -25,7 +29,7 @@ namespace Canducci.MongoDB.Repository
         { }
         public Repository(IConnect connect, MongoCollectionSettings mongoCollectionSettings)
         {
-            SetConnectAndCollection(connect, mongoCollectionSettings);
+            SetConnectAndCollection(connect, mongoCollectionSettings);            
         }
         #endregion
 
@@ -215,6 +219,23 @@ namespace Canducci.MongoDB.Repository
             return Collection.AsQueryable();
         }
 
+        #endregion
+
+        #region paged
+        public IPagedList<T> PagedList(int pageNumber, int pageSize)
+        {
+            return Query().ToPagedList<T>(pageNumber, pageSize);
+        }
+        
+        public IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy)
+        {
+            return Query().OrderBy(orderBy).ToPagedList<T>(pageNumber, pageSize);            
+        }
+
+        public IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
+        {
+            return Query().Where(filter).OrderBy(orderBy).ToPagedList<T>(pageNumber, pageSize);
+        }
         #endregion
 
         #region objectId

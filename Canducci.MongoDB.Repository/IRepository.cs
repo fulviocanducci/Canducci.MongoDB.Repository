@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using Canducci.MongoDB.Repository.Paged;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System;
@@ -10,6 +11,7 @@ namespace Canducci.MongoDB.Repository
 {
     public interface IRepository<T>
     {
+        IMongoCollection<T> Collection { get; }
         T Add(T model);
         IEnumerable<T> Add(IEnumerable<T> models);
         Task<T> AddAsync(T model);
@@ -40,6 +42,10 @@ namespace Canducci.MongoDB.Repository
         Task<bool> DeleteAsync(Expression<Func<T, bool>> filter);
 
         IMongoQueryable<T> Query();
+
+        IPagedList<T> PagedList(int pageNumber, int pageSize);        
+        IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy);
+        IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy);
 
         ObjectId CreateObjectId(string value);
 

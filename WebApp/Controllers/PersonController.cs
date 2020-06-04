@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver.Linq;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using WebApp.Models;
 
 namespace WebApp.Controllers
@@ -13,9 +16,10 @@ namespace WebApp.Controllers
             Repository = repository;
         }
                 
-        public ActionResult Index()
-        {
-            var data = Repository.All();
+        public ActionResult Index(int? page)
+        {            
+            var total = 2;                    
+            var data = Repository.PagedList(page ?? 1, total, w => w.Id != null && w.Name != null, x => x.Name);
             return View(data);
         }
 
