@@ -43,9 +43,12 @@ namespace Canducci.MongoDB.Repository
 
         IMongoQueryable<T> Query();
 
-        IPagedList<T> PagedList(int pageNumber, int pageSize);        
+        IPagedList<T> PagedList(int pageNumber, int pageSize);
+        Task<IPagedList<T>> PagedListAsync(int pageNumber, int pageSize);
         IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy);
+        Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy);
         IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy);
+        Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy);
 
         ObjectId CreateObjectId(string value);
 

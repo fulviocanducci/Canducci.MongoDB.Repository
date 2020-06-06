@@ -226,16 +226,24 @@ namespace Canducci.MongoDB.Repository
         {
             return Query().ToPagedList<T>(pageNumber, pageSize);
         }
-        
+
+        public async Task<IPagedList<T>> PagedListAsync(int pageNumber, int pageSize)
+            => await Task.FromResult(PagedList(pageNumber, pageSize));
+
         public IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy)
         {
             return Query().OrderBy(orderBy).ToPagedList<T>(pageNumber, pageSize);            
         }
 
+        public async Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy)
+            => await Task.FromResult(PagedList<Tkey>(pageNumber, pageSize, orderBy));
+
         public IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
         {
             return Query().Where(filter).OrderBy(orderBy).ToPagedList<T>(pageNumber, pageSize);
         }
+        public async Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
+            => await Task.FromResult(PagedList<Tkey>(pageNumber, pageSize, filter, orderBy));
         #endregion
 
         #region objectId
