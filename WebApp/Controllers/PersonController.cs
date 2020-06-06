@@ -1,11 +1,7 @@
 ﻿using Canducci.MongoDB.Repository.Paged;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using WebApp.Models;
 
@@ -21,8 +17,8 @@ namespace WebApp.Controllers
         }
                 
         public async Task<IActionResult> Index(int? page)
-        {            
-            var total = 30;                    
+        {   
+            int total = 30;                    
             IPagedList<Person> data = await Repository.PagedListAsync(page ?? 1, total, w => w.Id != null && w.Name != null, x => x.Name);            
             return View(data);
         }

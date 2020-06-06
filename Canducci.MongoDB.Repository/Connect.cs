@@ -12,13 +12,13 @@ namespace Canducci.MongoDB.Repository
         #endregion
 
         #region collection
-        public IMongoCollection<T> Collection<T>(string CollectionName)
+        public IMongoCollection<T> Collection<T>(string collectionName)
         {
-            return Collection<T>(CollectionName, null);
+            return Collection<T>(collectionName, null);
         }
-        public IMongoCollection<T> Collection<T>(string CollectionName, MongoCollectionSettings mongoCollectionSettings)
+        public IMongoCollection<T> Collection<T>(string collectionName, MongoCollectionSettings mongoCollectionSettings)
         {
-            return DataBase.GetCollection<T>(CollectionName, mongoCollectionSettings);
+            return DataBase.GetCollection<T>(collectionName, mongoCollectionSettings);
         }
         #endregion
 
