@@ -18,8 +18,9 @@ namespace WebApp.Controllers
                 
         public async Task<IActionResult> Index(int? page)
         {   
-            int total = 30;                    
-            IPagedList<Person> data = await Repository.PagedListAsync(page ?? 1, total, w => w.Id != null && w.Name != null, x => x.Name);            
+            int total = 5;                  
+            IPagedList<Person> data = await Repository
+                .PagedListAsync(page ?? 1, total, w => w.Id != null && w.Name != null, x => x.Name);            
             return View(data);
         }
 
