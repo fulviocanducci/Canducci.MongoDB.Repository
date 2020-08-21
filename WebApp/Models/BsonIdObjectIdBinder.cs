@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 //https://docs.microsoft.com/en-us/aspnet/core/mvc/advanced/custom-model-binding?view=aspnetcore-3.1
 namespace WebApp.Models
 {
-    public class BsonIdObjectIdBinder : IModelBinder
+    public class ObjectIdBinder : IModelBinder
     {        
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
@@ -42,7 +42,7 @@ namespace WebApp.Models
 
     }
 
-    public class BsonIdBinderProvider : IModelBinderProvider
+    public class ObjectIdBinderProvider : IModelBinderProvider
     {
         public IModelBinder GetBinder(ModelBinderProviderContext context)
         {
@@ -53,7 +53,7 @@ namespace WebApp.Models
 
             if (context.Metadata.ModelType == typeof(ObjectId))
             {
-                return new BinderTypeModelBinder(typeof(BsonIdObjectIdBinder));
+                return new BinderTypeModelBinder(typeof(ObjectIdBinder));
             }
 
             return null;

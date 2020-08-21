@@ -25,7 +25,7 @@ namespace WebApp
 
             services.AddControllersWithViews(options =>
             {
-                options.ModelBinderProviders.Insert(0, new BsonIdBinderProvider());
+                options.ModelBinderProviders.Insert(0, new ObjectIdBinderProvider());
             });
         }
 

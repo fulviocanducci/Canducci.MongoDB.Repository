@@ -54,7 +54,7 @@ namespace WebApp.Controllers
         {
             try
             {
-                Repository.Edit(x => x.Id == id, car);
+                Repository.Edit(id, car); Repository.Edit()
                 return RedirectToAction(nameof(Index));
             }
             catch
