@@ -9,10 +9,10 @@
     <RepositoryUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>repository mongodb</PackageTags>
-    <PackageReleaseNotes>v1.0.0</PackageReleaseNotes>
+    <PackageReleaseNotes>Short methods</PackageReleaseNotes>
     <PackageIcon>mongo.png</PackageIcon>
-    <Description>Add PagedList</Description>
-    <Version>1.0.1</Version>
+    <Description>Add PagedList &amp;&amp; add methods</Description>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
