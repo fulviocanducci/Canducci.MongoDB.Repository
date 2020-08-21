@@ -2,9 +2,9 @@
 
 namespace WebApp.Models
 {
-    public sealed class RepositoryPerson : RepositoryPersonImplementation
+    public sealed class RepositoryCar : RepositoryCarImplementation
     {
-        public RepositoryPerson(IConnect connect)
+        public RepositoryCar(IConnect connect)
             : base(connect)
         { }
 

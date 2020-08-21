@@ -4,13 +4,14 @@ using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Canducci.MongoDB.Repository
 {
     public interface IRepository<T>
-    {
+    {        
         IMongoCollection<T> Collection { get; }
         T Add(T model);
         IEnumerable<T> Add(IEnumerable<T> models);
@@ -25,7 +26,9 @@ namespace Canducci.MongoDB.Repository
         Task<bool> UpdateAsync(Expression<Func<T, bool>> filter, UpdateDefinition<T> update);
         Task<bool> UpdateAllAsync(Expression<Func<T, bool>> filter, UpdateDefinition<T> update);
 
+        T Find<TKey>(TKey key);
         T Find(Expression<Func<T, bool>> filter);
+        Task<T> FindAsync<TKey>(TKey key);
         Task<T> FindAsync(Expression<Func<T, bool>> filter);
 
         IEnumerable<T> All();
@@ -40,6 +43,9 @@ namespace Canducci.MongoDB.Repository
 
         bool Delete(Expression<Func<T, bool>> filter);
         Task<bool> DeleteAsync(Expression<Func<T, bool>> filter);
+
+        bool Delete<TKey>(TKey key);
+        Task<bool> DeleteAsync<TKey>(TKey key);
 
         IMongoQueryable<T> Query();
 

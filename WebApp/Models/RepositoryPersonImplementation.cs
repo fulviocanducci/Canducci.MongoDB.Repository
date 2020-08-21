@@ -1,5 +1,4 @@
 ﻿using Canducci.MongoDB.Repository;
-using MongoDB.Driver;
 
 namespace WebApp.Models
 {

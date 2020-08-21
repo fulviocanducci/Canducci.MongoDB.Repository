@@ -1,7 +1,6 @@
 ﻿using Canducci.MongoDB.Repository.Paged;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
 using System.Threading.Tasks;
 using WebApp.Models;
 
@@ -12,21 +11,21 @@ namespace WebApp.Controllers
         public RepositoryPersonImplementation Repository { get; }
 
         public PersonController(RepositoryPersonImplementation repository)
-        {            
-            Repository = repository;            
+        {
+            Repository = repository;
         }
-                
+
         public async Task<IActionResult> Index(int? page)
-        {   
-            int total = 5;                  
+        {
+            int total = 5;
             IPagedList<Person> data = await Repository
-                .PagedListAsync(page ?? 1, total, w => w.Id != null && w.Name != null, x => x.Name);            
+                .PagedListAsync(page ?? 1, total, w => w.Id != null && w.Name != null, x => x.Name);
             return View(data);
         }
 
         public ActionResult Details(string id)
         {
-            var data = Repository.Find(x => x.Id == id);
+            var data = Repository.Find(id);
             return View(data);
         }
 
@@ -82,14 +81,14 @@ namespace WebApp.Controllers
             var data = Repository.Find(x => x.Id == id);
             return View(data);
         }
-                
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(string id, IFormCollection collection)
         {
             try
             {
-                Repository.Delete(x => x.Id == id);
+                Repository.Delete(id);
                 return RedirectToAction(nameof(Index));
             }
             catch

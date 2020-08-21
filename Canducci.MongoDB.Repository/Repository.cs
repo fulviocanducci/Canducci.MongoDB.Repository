@@ -1,6 +1,7 @@
 ﻿using Canducci.MongoDB.Repository.Attributes;
 using Canducci.MongoDB.Repository.Paged;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System;
@@ -14,7 +15,9 @@ namespace Canducci.MongoDB.Repository
 {
     public abstract class Repository<T> : IRepository<T> where T : class, new()
     {
+
         #region protected
+        protected string BsonIdName { get; private set; }
         protected IConnect Connect { get; private set; }
         protected string CollectionName { get; private set; }
         #endregion
@@ -25,11 +28,11 @@ namespace Canducci.MongoDB.Repository
 
         #region construct
         public Repository(IConnect connect)
-            :this (connect, null)
+            : this(connect, null)
         { }
         public Repository(IConnect connect, MongoCollectionSettings mongoCollectionSettings)
         {
-            SetConnectAndCollection(connect, mongoCollectionSettings);            
+            SetConnectAndCollectionAndBsonId(connect, mongoCollectionSettings);
         }
         #endregion
 
@@ -105,16 +108,25 @@ namespace Canducci.MongoDB.Repository
         #endregion
 
         #region find
+        public T Find<TKey>(TKey key)
+        {            
+            return Collection.Find(GetFilterDefinition(key)).FirstOrDefault();
+        }
 
         public T Find(Expression<Func<T, bool>> filter)
         {
             return Collection.Find(filter).FirstOrDefault();
         }
+        public async Task<T> FindAsync<TKey>(TKey key)
+        {      
+            IAsyncCursor<T> result = await Collection.FindAsync(GetFilterDefinition(key));
+            return await result.FirstOrDefaultAsync();
+        }
 
         public async Task<T> FindAsync(Expression<Func<T, bool>> filter)
         {
             IAsyncCursor<T> result = await Collection.FindAsync(filter);
-            return result.FirstOrDefault();
+            return await result.FirstOrDefaultAsync();
         }
 
         #endregion
@@ -210,6 +222,17 @@ namespace Canducci.MongoDB.Repository
             return result.DeletedCount > 0;
         }
 
+        public bool Delete<TKey>(TKey key)
+        {               
+            return Collection.DeleteOne(GetFilterDefinition(key)).DeletedCount > 0;
+        }
+
+        public async Task<bool> DeleteAsync<TKey>(TKey key)
+        {                  
+            DeleteResult result = await Collection.DeleteOneAsync(GetFilterDefinition(key));
+            return result.DeletedCount > 0;
+        }
+
         #endregion
 
         #region queryAble
@@ -232,7 +255,7 @@ namespace Canducci.MongoDB.Repository
 
         public IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy)
         {
-            return Query().OrderBy(orderBy).ToPagedList<T>(pageNumber, pageSize);            
+            return Query().OrderBy(orderBy).ToPagedList<T>(pageNumber, pageSize);
         }
 
         public async Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy)
@@ -256,22 +279,31 @@ namespace Canducci.MongoDB.Repository
         #endregion
 
         #region Internal
-        internal void SetCollectionName()
+        internal void SetCollectionNameAndBsonId()
         {
-            BsonCollectionName bsonCollectionName = (BsonCollectionName)typeof(T)
-               .GetTypeInfo()
-               .GetCustomAttribute(typeof(BsonCollectionName));
+            TypeInfo typeInfo = typeof(T).GetTypeInfo();
+            BsonCollectionName bsonCollectionName = (BsonCollectionName)typeInfo.GetCustomAttribute(typeof(BsonCollectionName));
+            CollectionName = bsonCollectionName != null ? bsonCollectionName.Name : typeof(T).Name.ToLower();
 
-            CollectionName = bsonCollectionName != null
-                ? bsonCollectionName.Name
-                : typeof(T).Name.ToLower();
+            var id = typeInfo.GetProperties()
+                .Where(w => w.GetCustomAttribute(typeof(BsonIdAttribute)).GetType() == typeof(BsonIdAttribute)).FirstOrDefault();
+            BsonIdName = id?.Name;
         }
-        internal void SetConnectAndCollection(IConnect connect, MongoCollectionSettings mongoCollectionSettings)
+        internal void SetConnectAndCollectionAndBsonId(IConnect connect, MongoCollectionSettings mongoCollectionSettings)
         {
-            SetCollectionName();
+            SetCollectionNameAndBsonId();
             Connect = connect;
             Collection = Connect.Collection<T>(CollectionName, mongoCollectionSettings);
         }
-        #endregion                    
+        internal FilterDefinition<T> GetFilterDefinition<TKey>(TKey key)
+        {
+            if (string.IsNullOrEmpty(BsonIdName))
+            {
+                throw new ArgumentException($"'{nameof(BsonIdName)}' cannot be null or empty", nameof(BsonIdName));
+            }
+            StringFieldDefinition<T, TKey> field = new StringFieldDefinition<T, TKey>(BsonIdName);
+            return Builders<T>.Filter.Eq<TKey>(field, key);
+        }
+        #endregion
     }
 }

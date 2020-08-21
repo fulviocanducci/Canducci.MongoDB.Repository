@@ -21,8 +21,12 @@ namespace WebApp
         {
             services.AddScoped<IConnect, Connect>(_ => new Connect(Configuration));
             services.AddScoped<RepositoryPersonImplementation, RepositoryPerson>();
+            services.AddScoped<RepositoryCarImplementation, RepositoryCar>();
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(options =>
+            {
+                options.ModelBinderProviders.Insert(0, new BsonIdBinderProvider());
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

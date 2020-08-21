@@ -1,21 +1,21 @@
 ﻿using Canducci.MongoDB.Repository.Attributes;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.IdGenerators;
 using System.ComponentModel.DataAnnotations;
 
 namespace WebApp.Models
-{ 
+{
 
-    [BsonCollectionName("person")]
-    public class Person
+    [BsonCollectionName("car")]
+    public class Car
     {
-        [BsonId(IdGenerator = typeof(StringObjectIdGenerator))]
-        public string Id { get; set; }
+        [BsonId()]
+        public ObjectId Id { get; set; }
 
         [BsonElement("name")]
         [BsonRequired()]
         [Required()]
         public string Name { get; set; }
     }
+
 }
