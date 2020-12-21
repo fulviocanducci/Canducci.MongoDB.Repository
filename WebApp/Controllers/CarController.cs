@@ -43,6 +43,7 @@ namespace WebApp.Controllers
             }
         }
 
+        [HttpGet]
         public ActionResult Edit(ObjectId id)
         {
             return View(Repository.Find(id));
@@ -54,7 +55,7 @@ namespace WebApp.Controllers
         {
             try
             {
-                Repository.Edit(id, car); Repository.Edit()
+                Repository.Edit(id, car);
                 return RedirectToAction(nameof(Index));
             }
             catch

@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Canducci.MongoDB.Repository", "Canducci.MongoDB.Repository\Canducci.MongoDB.Repository.csproj", "{F3D3FA19-596F-4EE9-9F43-142D3A88A1E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Canducci.MongoDB.Repository", "Canducci.MongoDB.Repository\Canducci.MongoDB.Repository.csproj", "{F3D3FA19-596F-4EE9-9F43-142D3A88A1E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Canducci.MongoDB.Repository.UnitTest", "Canducci.MongoDB.Repository.UnitTest\Canducci.MongoDB.Repository.UnitTest.csproj", "{3C15CCEE-748B-4E76-A04D-E57B4853708D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Canducci.MongoDB.Repository.UnitTest", "Canducci.MongoDB.Repository.UnitTest\Canducci.MongoDB.Repository.UnitTest.csproj", "{3C15CCEE-748B-4E76-A04D-E57B4853708D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{1D8EFE0C-BD99-4105-8656-F9025D5609C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp", "WebApp\WebApp.csproj", "{B44514CB-8544-4A5C-972A-B04CDA613DEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp", "WebApp\WebApp.csproj", "{B44514CB-8544-4A5C-972A-B04CDA613DEA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{05BEB31A-CA9A-4D5F-BDB9-7B03C7731DA8}"
 	ProjectSection(SolutionItems) = preProject

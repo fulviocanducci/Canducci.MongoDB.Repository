@@ -12,11 +12,11 @@
     <PackageReleaseNotes>Short methods</PackageReleaseNotes>
     <PackageIcon>mongo.png</PackageIcon>
     <Description>Add PagedList &amp;&amp; add methods</Description>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.10.4" />
+    <PackageReference Include="MongoDB.Driver" Version="2.11.5" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
@@ -33,7 +33,7 @@
   
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Extensions.Configuration">
-      <Version>3.1.4</Version>
+      <Version>3.1.10</Version>
     </PackageReference>
   </ItemGroup>
   

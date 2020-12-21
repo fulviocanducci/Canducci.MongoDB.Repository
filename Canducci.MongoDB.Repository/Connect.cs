@@ -4,7 +4,7 @@ using System;
 
 namespace Canducci.MongoDB.Repository
 {
-    public sealed class Connect : IConnect
+    public partial class Connect : IConnect
     {
         #region private
         private MongoClient Client { get; set; }
