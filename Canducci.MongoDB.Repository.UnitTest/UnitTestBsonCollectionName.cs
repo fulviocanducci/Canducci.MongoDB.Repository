@@ -1,6 +1,5 @@
 using Canducci.MongoDB.Repository.Attributes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 namespace Canducci.MongoDB.Repository.UnitTest
 {
     [TestClass]
