@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Canducci.MongoDB.Repository
@@ -45,9 +46,9 @@ namespace Canducci.MongoDB.Repository
       /// </summary>
       /// <param name="model">Collection</param>
       /// <returns>Document</returns>
-      public T Add(T model)
+      public T Add(T model, CancellationToken cancellationToken = default)
       {
-         Collection.InsertOne(model);
+         Collection.InsertOne(model, cancellationToken: cancellationToken);
          return model;
       }
       /// <summary>
@@ -55,9 +56,9 @@ namespace Canducci.MongoDB.Repository
       /// </summary>
       /// <param name="models">Collections</param>
       /// <returns>Document</returns>
-      public IEnumerable<T> Add(IEnumerable<T> models)
+      public IEnumerable<T> Add(IEnumerable<T> models, CancellationToken cancellationToken = default)
       {
-         Collection.InsertMany(models);
+         Collection.InsertMany(models, cancellationToken: cancellationToken);
          return models;
       }
       /// <summary>
@@ -65,9 +66,9 @@ namespace Canducci.MongoDB.Repository
       /// </summary>
       /// <param name="model">Collection</param>
       /// <returns>Document</returns>
-      public async Task<T> AddAsync(T model)
+      public async Task<T> AddAsync(T model, CancellationToken cancellationToken = default)
       {
-         await Collection.InsertOneAsync(model);
+         await Collection.InsertOneAsync(model, cancellationToken: cancellationToken);
          return model;
       }
       /// <summary>
@@ -75,9 +76,9 @@ namespace Canducci.MongoDB.Repository
       /// </summary>
       /// <param name="models">Collections</param>
       /// <returns>Document</returns>
-      public async Task<IEnumerable<T>> AddAsync(IEnumerable<T> models)
+      public async Task<IEnumerable<T>> AddAsync(IEnumerable<T> models, CancellationToken cancellationToken = default)
       {
-         await Collection.InsertManyAsync(models);
+         await Collection.InsertManyAsync(models, cancellationToken: cancellationToken);
          return models;
       }
 
@@ -91,10 +92,10 @@ namespace Canducci.MongoDB.Repository
       /// <param name="key">Parameter value</param>
       /// <param name="model">Collection</param>
       /// <returns>bool</returns>
-      public bool Edit<TKey>(TKey key, T model)
+      public bool Edit<TKey>(TKey key, T model, CancellationToken cancellationToken = default)
       {
          return Collection
-             .ReplaceOne(GetFilterDefinition<TKey>(key), model)
+             .ReplaceOne(GetFilterDefinition<TKey>(key), model, cancellationToken: cancellationToken)
              .ModifiedCount > 0;
       }
       /// <summary>
@@ -104,10 +105,10 @@ namespace Canducci.MongoDB.Repository
       /// <param name="key">Parameter value</param>
       /// <param name="model">Collection</param>
       /// <returns>bool</returns>
-      public async Task<bool> EditAsync<TKey>(TKey key, T model)
+      public async Task<bool> EditAsync<TKey>(TKey key, T model, CancellationToken cancellationToken = default)
       {
          ReplaceOneResult result = await Collection
-             .ReplaceOneAsync(GetFilterDefinition<TKey>(key), model);
+             .ReplaceOneAsync(GetFilterDefinition<TKey>(key), model, cancellationToken: cancellationToken);
          return result.ModifiedCount > 0;
       }
       /// <summary>
@@ -116,10 +117,10 @@ namespace Canducci.MongoDB.Repository
       /// <param name="filter">Parameter filter</param>
       /// <param name="model">Collection</param>
       /// <returns>bool</returns>
-      public bool Edit(Expression<Func<T, bool>> filter, T model)
+      public bool Edit(Expression<Func<T, bool>> filter, T model, CancellationToken cancellationToken = default)
       {
          return Collection
-             .ReplaceOne(filter, model)
+             .ReplaceOne(filter, model, cancellationToken: cancellationToken)
              .ModifiedCount > 0;
       }
       /// <summary>
@@ -128,10 +129,10 @@ namespace Canducci.MongoDB.Repository
       /// <param name="filter">Parameter filter</param>
       /// <param name="model">Collection</param>
       /// <returns>bool</returns>
-      public async Task<bool> EditAsync(Expression<Func<T, bool>> filter, T model)
+      public async Task<bool> EditAsync(Expression<Func<T, bool>> filter, T model, CancellationToken cancellationToken = default)
       {
          ReplaceOneResult result = await Collection
-             .ReplaceOneAsync(filter, model);
+             .ReplaceOneAsync(filter, model, cancellationToken: cancellationToken);
          return result.ModifiedCount > 0;
       }
 
@@ -144,9 +145,9 @@ namespace Canducci.MongoDB.Repository
       /// <param name="filter">Parameter filter</param>
       /// <param name="update">Base class for updates</param>
       /// <returns>bool</returns>
-      public bool Update(Expression<Func<T, bool>> filter, UpdateDefinition<T> update)
+      public bool Update(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default)
       {
-         return Collection.UpdateOne(filter, update).ModifiedCount > 0;
+         return Collection.UpdateOne(filter, update, cancellationToken: cancellationToken).ModifiedCount > 0;
       }
       /// <summary>
       /// Updates many documents
@@ -154,9 +155,9 @@ namespace Canducci.MongoDB.Repository
       /// <param name="filter">Parameter filter</param>
       /// <param name="update">Base class for updates</param>
       /// <returns>bool</returns>
-      public bool UpdateAll(Expression<Func<T, bool>> filter, UpdateDefinition<T> update)
+      public bool UpdateAll(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default)
       {
-         return Collection.UpdateMany(filter, update).ModifiedCount > 0;
+         return Collection.UpdateMany(filter, update, cancellationToken: cancellationToken).ModifiedCount > 0;
       }
       /// <summary>
       /// Updates a single document
@@ -164,9 +165,9 @@ namespace Canducci.MongoDB.Repository
       /// <param name="filter">Parameter filter</param>
       /// <param name="update">Base class for updates</param>
       /// <returns>bool</returns>
-      public async Task<bool> UpdateAsync(Expression<Func<T, bool>> filter, UpdateDefinition<T> update)
+      public async Task<bool> UpdateAsync(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default)
       {
-         UpdateResult result = await Collection.UpdateOneAsync(filter, update);
+         UpdateResult result = await Collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
          return result.ModifiedCount > 0;
       }
       /// <summary>
@@ -175,9 +176,9 @@ namespace Canducci.MongoDB.Repository
       /// <param name="filter">Parameter filter</param>
       /// <param name="update">Base class for updates</param>
       /// <returns>bool</returns>
-      public async Task<bool> UpdateAllAsync(Expression<Func<T, bool>> filter, UpdateDefinition<T> update)
+      public async Task<bool> UpdateAllAsync(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default)
       {
-         UpdateResult result = await Collection.UpdateManyAsync(filter, update);
+         UpdateResult result = await Collection.UpdateManyAsync(filter, update, cancellationToken: cancellationToken);
          return result.ModifiedCount > 0;
       }
 
@@ -190,18 +191,18 @@ namespace Canducci.MongoDB.Repository
       /// <typeparam name="TKey">Parameter type</typeparam>
       /// <param name="key">Parameter value</param>
       /// <returns>Document</returns>
-      public T Find<TKey>(TKey key)
+      public T Find<TKey>(TKey key, CancellationToken cancellationToken = default)
       {
-         return Collection.Find(GetFilterDefinition(key)).FirstOrDefault();
+         return Collection.Find(GetFilterDefinition(key)).FirstOrDefault(cancellationToken);
       }
       /// <summary>
       /// Find
       /// </summary>
       /// <param name="filter">Parameter filter</param>
       /// <returns>Document</returns>
-      public T Find(Expression<Func<T, bool>> filter)
+      public T Find(Expression<Func<T, bool>> filter, CancellationToken cancellationToken = default)
       {
-         return Collection.Find(filter).FirstOrDefault();
+         return Collection.Find(filter).FirstOrDefault(cancellationToken);
       }
       /// <summary>
       /// Find
@@ -209,20 +210,20 @@ namespace Canducci.MongoDB.Repository
       /// <typeparam name="TKey">Parameter type</typeparam>
       /// <param name="key">Parameter value</param>
       /// <returns>Document</returns>
-      public async Task<T> FindAsync<TKey>(TKey key)
+      public async Task<T> FindAsync<TKey>(TKey key, CancellationToken cancellationToken = default)
       {
          IAsyncCursor<T> result = await Collection.FindAsync(GetFilterDefinition(key));
-         return await result.FirstOrDefaultAsync();
+         return await result.FirstOrDefaultAsync(cancellationToken);
       }
       /// <summary>
       /// Find
       /// </summary>
       /// <param name="filter">Parameter Filter</param>
       /// <returns>Document</returns>
-      public async Task<T> FindAsync(Expression<Func<T, bool>> filter)
+      public async Task<T> FindAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken = default)
       {
-         IAsyncCursor<T> result = await Collection.FindAsync(filter);
-         return await result.FirstOrDefaultAsync();
+         IAsyncCursor<T> result = await Collection.FindAsync(filter, cancellationToken: cancellationToken);
+         return await result.FirstOrDefaultAsync(cancellationToken);
       }
 
       #endregion
@@ -260,9 +261,9 @@ namespace Canducci.MongoDB.Repository
       /// IEnumerable Documents
       /// </summary>
       /// <returns>IEnumerable Documents</returns>
-      public async Task<IList<T>> AllAsync()
+      public async Task<IEnumerable<T>> AllAsync()
       {
-         return await Collection.AsQueryable().ToListAsync();
+         return await Task.FromResult(Collection.AsQueryable().AsEnumerable());
 
       }
       /// <summary>
@@ -270,9 +271,9 @@ namespace Canducci.MongoDB.Repository
       /// </summary>
       /// <param name="filter">Parameter filter</param>
       /// <returns>IEnumerable Documents</returns>
-      public async Task<IList<T>> AllAsync(Expression<Func<T, bool>> filter)
+      public async Task<IEnumerable<T>> AllAsync(Expression<Func<T, bool>> filter)
       {
-         return await Collection.AsQueryable().Where(filter).ToListAsync();
+         return await Task.FromResult(Collection.AsQueryable().Where(filter).AsEnumerable());
       }
       /// <summary>
       /// IEnumerable Documents
@@ -281,9 +282,9 @@ namespace Canducci.MongoDB.Repository
       /// <param name="filter">Parameter filter</param>
       /// <param name="orderBy">Parameter orderBy</param>
       /// <returns>IEnumerable Document</returns>
-      public async Task<IList<T>> AllAsync<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
+      public async Task<IEnumerable<T>> AllAsync<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
       {
-         return await Collection.AsQueryable().Where(filter).OrderBy(orderBy).ToListAsync();
+         return await Task.FromResult(Collection.AsQueryable().Where(filter).OrderBy(orderBy).AsEnumerable());
       }
       #endregion
 
@@ -295,12 +296,12 @@ namespace Canducci.MongoDB.Repository
       /// <param name="orderBy">Parameter orderBy</param>
       /// <param name="filter">`Parameter filter</param>
       /// <returns>List documents</returns>
-      public IList<T> List<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null)
+      public IEnumerable<T> List<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null)
       {
-         IMongoQueryable<T> query = Collection.AsQueryable();
+         IQueryable<T> query = Collection.AsQueryable();
          return (filter != null)
-             ? query.Where(filter).OrderBy(orderBy).ToList()
-             : query.OrderBy(orderBy).ToList();
+             ? query.Where(filter).OrderBy(orderBy).AsEnumerable()
+             : query.OrderBy(orderBy).AsEnumerable();
       }
       /// <summary>
       /// List documents
@@ -309,14 +310,13 @@ namespace Canducci.MongoDB.Repository
       /// <param name="orderBy">Parameter orderBy</param>
       /// <param name="filter">`Parameter filter</param>
       /// <returns>List documents</returns>
-      public async Task<IList<T>> ListAsync<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null)
+      public async Task<IEnumerable<T>> ListAsync<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null)
       {
-         IMongoQueryable<T> query = Collection.AsQueryable();
+         IQueryable<T> query = Collection.AsQueryable();
          return (filter != null)
-             ? await query.Where(filter).OrderBy(orderBy).ToListAsync()
-             : await query.OrderBy(orderBy).ToListAsync();
+             ? await Task.FromResult(query.Where(filter).OrderBy(orderBy).AsEnumerable())
+             : await Task.FromResult(query.OrderBy(orderBy).AsEnumerable());
       }
-
       #endregion
 
       #region count
@@ -324,9 +324,9 @@ namespace Canducci.MongoDB.Repository
       /// Returns number of documents in the collection
       /// </summary>
       /// <returns>long</returns>
-      public long Count()
+      public long Count(CancellationToken cancellationToken = default)
       {
-         return Collection.CountDocuments(Builders<T>.Filter.Empty);
+         return Collection.CountDocuments(Builders<T>.Filter.Empty, cancellationToken: cancellationToken);
       }
       /// <summary>
       /// Returns number of documents in the collection
@@ -334,17 +334,17 @@ namespace Canducci.MongoDB.Repository
       /// <param name="filter">Parameter filter</param>
       /// <param name="options">Parameter CountOptions</param>
       /// <returns>long</returns>
-      public long Count(Expression<Func<T, bool>> filter, CountOptions options = null)
+      public long Count(Expression<Func<T, bool>> filter, CountOptions options = null, CancellationToken cancellationToken = default)
       {
-         return Collection.CountDocuments(filter, options);
+         return Collection.CountDocuments(filter, options, cancellationToken);
       }
       /// <summary>
       /// Returns number of documents in the collection
       /// </summary>
       /// <returns>long</returns>
-      public async Task<long> CountAsync()
+      public async Task<long> CountAsync(CancellationToken cancellationToken = default)
       {
-         return await Collection.CountDocumentsAsync(Builders<T>.Filter.Empty);
+         return await Collection.CountDocumentsAsync(Builders<T>.Filter.Empty, cancellationToken: cancellationToken);
       }
       /// <summary>
       /// Returns number of documents in the collection
@@ -352,9 +352,9 @@ namespace Canducci.MongoDB.Repository
       /// <param name="filter">Parameter filter</param>
       /// <param name="options">Parameter CountOptions</param>
       /// <returns>long</returns>
-      public async Task<long> CountAsync(Expression<Func<T, bool>> filter, CountOptions options = null)
+      public async Task<long> CountAsync(Expression<Func<T, bool>> filter, CountOptions options = null, CancellationToken cancellationToken = default)
       {
-         return await Collection.CountDocumentsAsync(filter, options);
+         return await Collection.CountDocumentsAsync(filter, options, cancellationToken);
       }
 
       #endregion
@@ -365,18 +365,18 @@ namespace Canducci.MongoDB.Repository
       /// </summary>
       /// <param name="filter">Parameter filter</param>
       /// <returns>bool</returns>
-      public bool Delete(Expression<Func<T, bool>> filter)
+      public bool Delete(Expression<Func<T, bool>> filter, CancellationToken cancellationToken = default)
       {
-         return Collection.DeleteOne(filter).DeletedCount > 0;
+         return Collection.DeleteOne(filter, cancellationToken).DeletedCount > 0;
       }
       /// <summary>
       /// Delete a single document
       /// </summary>
       /// <param name="filter">Parameter filter</param>
       /// <returns>bool</returns>
-      public async Task<bool> DeleteAsync(Expression<Func<T, bool>> filter)
+      public async Task<bool> DeleteAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken = default)
       {
-         DeleteResult result = await Collection.DeleteOneAsync(filter);
+         DeleteResult result = await Collection.DeleteOneAsync(filter, cancellationToken);
          return result.DeletedCount > 0;
       }
       /// <summary>
@@ -385,9 +385,9 @@ namespace Canducci.MongoDB.Repository
       /// <typeparam name="TKey">Parameter type</typeparam>
       /// <param name="key">Parameter value</param>
       /// <returns>bool</returns>
-      public bool Delete<TKey>(TKey key)
+      public bool Delete<TKey>(TKey key, CancellationToken cancellationToken = default)
       {
-         return Collection.DeleteOne(GetFilterDefinition(key)).DeletedCount > 0;
+         return Collection.DeleteOne(GetFilterDefinition(key), cancellationToken).DeletedCount > 0;
       }
       /// <summary>
       /// Delete a single document
@@ -395,9 +395,9 @@ namespace Canducci.MongoDB.Repository
       /// <typeparam name="TKey">Parameter type</typeparam>
       /// <param name="key">Parameter value</param>
       /// <returns>bool</returns>
-      public async Task<bool> DeleteAsync<TKey>(TKey key)
+      public async Task<bool> DeleteAsync<TKey>(TKey key, CancellationToken cancellationToken = default)
       {
-         DeleteResult result = await Collection.DeleteOneAsync(GetFilterDefinition(key));
+         DeleteResult result = await Collection.DeleteOneAsync(GetFilterDefinition(key), cancellationToken);
          return result.DeletedCount > 0;
       }
 
@@ -408,7 +408,7 @@ namespace Canducci.MongoDB.Repository
       /// Queryable source
       /// </summary>
       /// <returns></returns>
-      public IMongoQueryable<T> Query()
+      public IQueryable<T> Query()
       {
          return Collection.AsQueryable();
       }

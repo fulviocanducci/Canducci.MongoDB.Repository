@@ -1,48 +1,42 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net48;netstandard2.0</TargetFrameworks>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>fulviocanducci</Authors>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>repository mongodb</PackageTags>
-    <PackageReleaseNotes>Short methods</PackageReleaseNotes>
-    <PackageIcon>mongo.png</PackageIcon>
-    <Description>Add PagedList &amp;&amp; add methods</Description>
-    <Version>2.0.0</Version>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <AssemblyVersion>2.0.0</AssemblyVersion>
-    <FileVersion>2.0.0</FileVersion>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.19.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
-    <PackageReference Include="Microsoft.Extensions.Configuration">
-      <Version>1.1.2</Version>
-    </PackageReference>
-  </ItemGroup>
-    
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.Extensions.Configuration">
-      <Version>3.1.32</Version>
-    </PackageReference>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="..\images\mongo.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-
+   <PropertyGroup>
+      <TargetFrameworks>netstandard2.0;netstandard2.1;</TargetFrameworks>
+      <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+      <Authors>fulviocanducci</Authors>
+      <PackageLicenseExpression>MIT</PackageLicenseExpression>
+      <PackageProjectUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</PackageProjectUrl>
+      <RepositoryUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</RepositoryUrl>
+      <RepositoryType>git</RepositoryType>
+      <PackageTags>repository mongodb</PackageTags>
+      <PackageReleaseNotes>Short methods</PackageReleaseNotes>
+      <PackageIcon>mongo.png</PackageIcon>
+      <Description>Add PagedList &amp;&amp; add methods</Description>
+      <Version>3.0.0</Version>
+      <PackageReadmeFile>README.md</PackageReadmeFile>
+      <AssemblyVersion>3.0.0</AssemblyVersion>
+      <FileVersion>3.0.0</FileVersion>
+   </PropertyGroup>   
+   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+      <PackageReference Include="Microsoft.Extensions.Configuration">
+         <Version>3.1.32</Version>
+      </PackageReference>
+      <PackageReference Include="MongoDB.Driver" Version="2.30.0" />
+   </ItemGroup>
+   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+      <PackageReference Include="Microsoft.Extensions.Configuration">         
+         <Version>3.1.32</Version>
+      </PackageReference>
+      <PackageReference Include="MongoDB.Driver" Version="3.1.0" />
+   </ItemGroup>
+   <ItemGroup>
+      <None Include="..\images\mongo.png">
+         <Pack>True</Pack>
+         <PackagePath></PackagePath>
+      </None>
+      <None Include="..\README.md">
+         <Pack>True</Pack>
+         <PackagePath>\</PackagePath>
+      </None>
+   </ItemGroup>
 </Project>

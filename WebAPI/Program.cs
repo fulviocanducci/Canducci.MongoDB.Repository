@@ -9,7 +9,7 @@ namespace WebAPI
       public static void Main(string[] args)
       {
          WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-         IConfiguration configuration = builder.Configuration;
+         ConfigurationManager configuration = builder.Configuration;
          // 
          builder.Services.AddControllers();
          builder.Services.AddOpenApi();

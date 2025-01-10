@@ -1,11 +1,11 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using BsonIdGeneratorTypes = MongoDB.Bson.Serialization.IdGenerators;
 namespace WebAPI.Models
 {
    public class People
    {
-      [BsonId(IdGenerator = typeof(BsonIdGeneratorTypes.CombGuidGenerator))]
+      [BsonId()]
+      [BsonGuidRepresentation(GuidRepresentation.CSharpLegacy)]
       public Guid Id { get; set; }
 
       [BsonElement("name")]
