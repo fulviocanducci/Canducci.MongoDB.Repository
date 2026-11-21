@@ -105,7 +105,7 @@ public class PersonController : Controller
     {
         Repository = repository;
     }
-            
+
     public ActionResult Index()
     {
         var data = Repository.All();
@@ -170,7 +170,7 @@ public class PersonController : Controller
         var data = Repository.Find(x => x.Id == id);
         return View(data);
     }
-            
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public ActionResult Delete(string id, IFormCollection collection)
@@ -195,71 +195,78 @@ In `controller`:
 ```csharp
 public async Task<IActionResult> Index(int? page)
 {
-    int total = 5;
+    const int pageSize = 5;
     IPagedList<Person> data = await Repository
-        .PagedListAsync(page ?? 1, total);
+        .PagedListAsync(page ?? 1, pageSize);
     return View(data);
 }
 ```
 
-In `View`
+In `View`:
 
-```csharp
+```cshtml
 @model Canducci.MongoDB.Repository.Paged.IPagedList<WebApp.Models.Person>
 
 @{
-  ViewData["Title"] = "Index";
+    ViewData["Title"] = "Index";
 }
 
-<h1>Count Register Person @ViewBag.Count</h1>
-
-<p>
-  <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
-  <thead>
-    <tr>
-      <th class="text-center">
-        Id
-      </th>
-      <th class="text-center">
-        Name
-      </th>
-      <th class="text-center">...</th>
-    </tr>
-  </thead>
-  <tbody>
-    @foreach (var item in Model)
-    {
-      <tr>
-        <td style="width:23%;text-align:center">
-          @Html.DisplayFor(modelItem => item.Id)
-        </td>
-        <td>
-          @Html.DisplayFor(modelItem => item.Name)
-        </td>
-        <td style="width:20%;text-align:center">
-          @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-          @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-          @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-        </td>
-      </tr>
-}
-  </tbody>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+            </tr>
+        }
+    </tbody>
 </table>
-<div class="row">
-  <div class="col-md-5 text-right">
-    @if (Model.HasPreviousPage)
-    {
-      <a href="/Person?page=@(Model.PageNumber - 1)">Previous</a>
-    }
-  </div>
-  <div class="col-md-5 text-left">
-    @if (Model.HasNextPage)
-    {
-      <a href="/Person?page=@(Model.PageNumber + 1)">Next</a>
-    }
-  </div>
-</div>
 
+<div class="row">
+    <div class="col-md-5 text-right">
+        @if (Model.HasPreviousPage)
+        {
+            <a href="/Person?page=@(Model.PageNumber - 1)">Previous</a>
+        }
+    </div>
+    <div class="col-md-5 text-left">
+        @if (Model.HasNextPage)
+        {
+            <a href="/Person?page=@(Model.PageNumber + 1)">Next</a>
+        }
+    </div>
+</div>
 ```
+
+#### Integration with Canducci.Pagination.Mvc
+
+The repository pagination result implements `Canducci.Pagination.Interfaces.IPaginated<T>`. You can therefore pass the same `IPagedList<T>` directly to the HTML helper provided by `Canducci.Pagination.Mvc`, without converting the result or loading the collection into memory again.
+
+Install `Canducci.Pagination.Mvc` in your ASP.NET Core MVC application:
+
+```powershell
+PM> Install-Package Canducci.Pagination.Mvc
+```
+
+In your Razor View:
+
+```cshtml
+@using Canducci.Pagination.Mvc
+@using Canducci.Pagination.Interfaces
+@model Canducci.MongoDB.Repository.Paged.IPagedList<WebApp.Models.Person>
+
+@Html.Pagination(
+    Model,
+    page => Url.Action("Index", new { page }),
+    PaginatedStyle.NumbersWithFirstPreviousNextLast
+)
+```
+
+The MVC package provides the pagination styles and HTML rendering. The MongoDB repository remains independent of ASP.NET Core MVC and continues to execute paged queries through the MongoDB driver.

@@ -8,15 +8,18 @@
       <PackageProjectUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</PackageProjectUrl>
       <RepositoryUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</RepositoryUrl>
       <RepositoryType>git</RepositoryType>
-      <PackageTags>repository mongodb</PackageTags>
-      <PackageReleaseNotes>Short methods</PackageReleaseNotes>
+      <PackageTags>repository mongodb pagination</PackageTags>
+      <PackageReleaseNotes>Improve pagination and add Canducci.Pagination.Mvc compatibility</PackageReleaseNotes>
       <PackageIcon>mongo.png</PackageIcon>
-      <Description>Add PagedList &amp;&amp; add methods</Description>
+      <Description>MongoDB repository with asynchronous operations and Canducci pagination support</Description>
       <Version>3.0.0</Version>
       <PackageReadmeFile>README.md</PackageReadmeFile>
       <AssemblyVersion>3.0.0</AssemblyVersion>
       <FileVersion>3.0.0</FileVersion>
-   </PropertyGroup>   
+   </PropertyGroup>
+   <ItemGroup>
+      <PackageReference Include="Canducci.Pagination" Version="3.3.0" />
+   </ItemGroup>
    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
       <PackageReference Include="Microsoft.Extensions.Configuration">
          <Version>3.1.32</Version>
@@ -25,7 +28,7 @@
       <PackageReference Include="MongoDB.Driver" Version="2.30.0" />
    </ItemGroup>
    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-      <PackageReference Include="Microsoft.Extensions.Configuration">         
+      <PackageReference Include="Microsoft.Extensions.Configuration">
          <Version>3.1.32</Version>
       </PackageReference>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.32" />
