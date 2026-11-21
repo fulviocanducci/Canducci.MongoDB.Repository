@@ -44,6 +44,18 @@ namespace Canducci.MongoDB.Repository.UnitTest
             Assert.IsTrue(paginated.HasNextPage);
             Assert.IsTrue(paginated.Pages.Contains(1));
             Assert.IsTrue(paginated.Pages.Contains(5));
+
+            IPagedList<string> pagedList = new PagedList<string>(
+                new List<string> { "item-2" },
+                2,
+                2,
+                10);
+
+            Assert.IsTrue(pagedList.HasPreviousPage);
+            Assert.IsTrue(pagedList.HasNextPage);
+
+            IPagedList metadata = pagedList;
+            Assert.AreEqual(5, metadata.PageCount);
         }
 
         [TestMethod]
