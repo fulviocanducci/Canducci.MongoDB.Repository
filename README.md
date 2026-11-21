@@ -1,23 +1,37 @@
 # Canducci MongoDB Repository
 
+[![Build and Publish](https://github.com/fulviocanducci/Canducci.MongoDB.Repository/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/fulviocanducci/Canducci.MongoDB.Repository/actions/workflows/build.yml)
 [![NuGet](https://img.shields.io/nuget/v/Canducci.MongoDB.Repository.svg?style=plastic&label=version)](https://www.nuget.org/packages/Canducci.MongoDB.Repository/)
 [![NuGet](https://img.shields.io/nuget/dt/Canducci.MongoDB.Repository.svg)](https://www.nuget.org/packages/Canducci.MongoDB.Repository/)
 
-#### Install Package (NUGET)
+## Installation
 
-To install Canducci MongoDB Repository run the following command in the Package Manager Console
+Install the package from NuGet:
 
-```csharp
-PM> Install-Package Canducci.MongoDB.Repository
+```powershell
+dotnet add package Canducci.MongoDB.Repository
 ```
 
-#### How to use?
+Or use the Package Manager Console:
 
-Create in your `appsettings.json` key ***MongoDB***:
+```powershell
+Install-Package Canducci.MongoDB.Repository
+```
+
+## Target frameworks and MongoDB driver
+
+| Target framework | MongoDB.Driver |
+| --- | --- |
+| `netstandard2.0` | 2.30.0 |
+| `netstandard2.1` | 3.14.1 |
+| `net10.0` | 3.14.1 |
+
+## Configuration
+
+Add the MongoDB settings to your `appsettings.json`:
 
 ```json
 {
-  ...
   "MongoDB": {
     "Database": "dbnew",
     "ConnectionStrings": "mongodb://localhost:27017"
@@ -25,7 +39,23 @@ Create in your `appsettings.json` key ***MongoDB***:
 }
 ```
 
-Make a class that represents your Collection in MongoDB
+Register the repository using the application configuration:
+
+```csharp
+builder.Services.AddMongoDBRepository(builder.Configuration);
+```
+
+Alternatively, provide the database name and connection string directly:
+
+```csharp
+builder.Services.AddMongoDBRepository("dbnew", "mongodb://localhost:27017");
+```
+
+Both overloads register a singleton `IMongoClient` and a singleton `IConnect`. The same MongoDB client instance is reused by the repository.
+
+## Model
+
+Create a class that represents a MongoDB collection:
 
 ```csharp
 using Canducci.MongoDB.Repository.Attributes;
@@ -42,37 +72,31 @@ namespace WebApp.Models
         public string Id { get; set; }
 
         [BsonElement("name")]
-        [BsonRequired()]
-        [Required()]
+        [BsonRequired]
+        [Required]
         public string Name { get; set; }
     }
 }
 ```
 
-**Note:** It has a BsonCollectionName attribute that has the configuration of the name of your collection in mongo , if by chance not pass he takes the class name.
+The `BsonCollectionName` attribute defines the MongoDB collection name. If it is not provided, the repository uses the class name.
 
-Next step will be the creation of Repository.
+## Repository
 
-Create a class and declare these two `namespace`:
-
-#### Codification:
+Create an abstract repository and its concrete implementation:
 
 ```csharp
 using Canducci.MongoDB.Repository;
+
 namespace WebApp.Models
 {
-    //class abstract
     public abstract class RepositoryPersonImplementation : Repository<Person>
     {
         protected RepositoryPersonImplementation(IConnect connect) : base(connect)
         {
         }
     }
-}
 
-namespace WebApp.Models
-{
-    //class Concret
     public sealed class RepositoryPerson : RepositoryPersonImplementation
     {
         public RepositoryPerson(IConnect connect) : base(connect)
@@ -82,143 +106,58 @@ namespace WebApp.Models
 }
 ```
 
-Configure dependency injection in `ConfigureServices`. You can register the repository using the application configuration:
+Register the repository implementation in dependency injection:
 
 ```csharp
-public void ConfigureServices(IServiceCollection services)
-{
-    services.AddMongoDBRepository(configuration);
-    services.AddScoped<RepositoryPersonImplementation, RepositoryPerson>();
-
-    services.AddControllersWithViews();
-}
+builder.Services.AddScoped<RepositoryPersonImplementation, RepositoryPerson>();
 ```
 
-Alternatively, provide the database name and connection string directly:
-
-```csharp
-services.AddMongoDBRepository("dbnew", "mongodb://localhost:27017");
-```
-
-Both overloads register a single `IMongoClient` instance and `IConnect` as singletons. The same MongoDB client is reused by the repository.
-
-In `controller`, import `Canducci.Pagination.Interfaces` to use the `IPaginated<T>` contract:
+Inject it into your controller:
 
 ```csharp
 public class PersonController : Controller
 {
-    public RepositoryPersonImplementation Repository { get; }
+    private readonly RepositoryPersonImplementation _repository;
 
     public PersonController(RepositoryPersonImplementation repository)
     {
-        Repository = repository;
+        _repository = repository;
     }
 
-    public ActionResult Index()
+    public IActionResult Index()
     {
-        var data = Repository.All();
-        return View(data);
+        IReadOnlyList<Person> people = _repository.All();
+        return View(people);
     }
 
-    public ActionResult Details(string id)
+    public IActionResult Details(string id)
     {
-        var data = Repository.Find(x => x.Id == id);
-        return View(data);
-    }
-
-    public ActionResult Create()
-    {
-        return View();
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public ActionResult Create(Person person)
-    {
-        try
-        {
-            if (ModelState.IsValid)
-            {
-                Repository.Add(person);
-            }
-            return RedirectToAction(nameof(Index));
-        }
-        catch
-        {
-            return View();
-        }
-    }
-
-    public ActionResult Edit(string id)
-    {
-        var data = Repository.Find(x => x.Id == id);
-        return View(data);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public ActionResult Edit(string id, Person person)
-    {
-        try
-        {
-            if (ModelState.IsValid)
-            {
-                Repository.Edit(x => x.Id == id, person);
-            }
-            return RedirectToAction(nameof(Index));
-        }
-        catch
-        {
-            return View();
-        }
-    }
-
-    public ActionResult Delete(string id)
-    {
-        var data = Repository.Find(x => x.Id == id);
-        return View(data);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public ActionResult Delete(string id, IFormCollection collection)
-    {
-        try
-        {
-            Repository.Delete(x => x.Id == id);
-            return RedirectToAction(nameof(Index));
-        }
-        catch
-        {
-            return View();
-        }
+        Person person = _repository.Find(x => x.Id == id);
+        return View(person);
     }
 }
 ```
 
-#### Paginated:
+## Pagination
 
-In `controller`:
+The pagination methods return `Canducci.Pagination.Interfaces.IPaginated<T>`:
 
 ```csharp
+using Canducci.Pagination.Interfaces;
+
 public async Task<IActionResult> Index(int? page)
 {
     const int pageSize = 5;
-    IPaginated<Person> data = await Repository
-        .PagedListAsync(page ?? 1, pageSize);
-    return View(data);
+    IPaginated<Person> people = await _repository.PagedListAsync(page ?? 1, pageSize);
+    return View(people);
 }
 ```
 
-In `View`:
+In a Razor view:
 
 ```cshtml
 @using Canducci.Pagination.Interfaces
 @model IPaginated<WebApp.Models.Person>
-
-@{
-    ViewData["Title"] = "Index";
-}
 
 <table class="table">
     <thead>
@@ -228,43 +167,28 @@ In `View`:
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var person in Model)
         {
             <tr>
-                <td>@item.Id</td>
-                <td>@item.Name</td>
+                <td>@person.Id</td>
+                <td>@person.Name</td>
             </tr>
         }
     </tbody>
 </table>
-
-<div class="row">
-    <div class="col-md-5 text-right">
-        @if (Model.HasPreviousPage)
-        {
-            <a href="/Person?page=@(Model.PageNumber - 1)">Previous</a>
-        }
-    </div>
-    <div class="col-md-5 text-left">
-        @if (Model.HasNextPage)
-        {
-            <a href="/Person?page=@(Model.PageNumber + 1)">Next</a>
-        }
-    </div>
-</div>
 ```
 
-#### Integration with Canducci.Pagination.Mvc
+### Canducci.Pagination.Mvc integration
 
-The repository pagination result implements `Canducci.Pagination.Interfaces.IPaginated<T>`. You can therefore pass the same `IPaginated<T>` directly to the HTML helper provided by `Canducci.Pagination.Mvc`, without converting the result or loading the collection into memory again.
+The repository pagination result implements `IPaginated<T>`, so it can be passed directly to the HTML helper from `Canducci.Pagination.Mvc`.
 
-Install `Canducci.Pagination.Mvc` in your ASP.NET Core MVC application:
+Install the MVC integration package:
 
 ```powershell
-PM> Install-Package Canducci.Pagination.Mvc
+dotnet add package Canducci.Pagination.Mvc
 ```
 
-In your Razor View:
+Use the helper in your Razor view:
 
 ```cshtml
 @using Canducci.Pagination.Mvc
@@ -278,12 +202,11 @@ In your Razor View:
 )
 ```
 
-The MVC package provides the pagination styles and HTML rendering. The MongoDB repository remains independent of ASP.NET Core MVC and continues to execute paged queries through the MongoDB driver.
+The MVC package provides pagination styles and HTML rendering. The MongoDB repository remains independent of ASP.NET Core MVC and executes paged queries through the MongoDB driver.
 
+## Repository operation contracts (4.0.0)
 
-#### Repository operation contracts (4.0.0)
-
-Collection-returning methods now return materialized `IReadOnlyList<T>` results. This applies to `Add(IEnumerable<T>)`, `AddAsync(IEnumerable<T>)`, `All`, `AllAsync`, `List` and `ListAsync`. The returned collection is a stable snapshot and does not execute a deferred MongoDB query when enumerated.
+Collection-returning methods return materialized `IReadOnlyList<T>` results. This applies to `Add(IEnumerable<T>)`, `AddAsync(IEnumerable<T>)`, `All`, `AllAsync`, `List` and `ListAsync`. The returned collection is a stable snapshot and does not execute a deferred MongoDB query when enumerated.
 
 Update methods return the MongoDB driver's `UpdateResult` instead of a boolean:
 
@@ -294,4 +217,21 @@ Use `MatchedCount` to inspect how many documents matched, `ModifiedCount` to ins
 
 `Edit` and `EditAsync` return `true` when a document matched the replacement filter, even if the replacement content was identical and MongoDB reports no modified documents.
 
-All asynchronous collection-reading methods accept an optional `CancellationToken`.
+Asynchronous operations accept an optional `CancellationToken`.
+
+## Build and release
+
+The GitHub Actions workflow is defined in `.github/workflows/build.yml`. It restores dependencies, builds the library for all target frameworks, runs the test project, and generates a NuGet package artifact.
+
+The workflow runs on pushes and pull requests targeting `master`, and can also be started manually. These executions **do not publish** to NuGet.
+
+Publishing is restricted to version tags matching `v*`. For example, creating and pushing the tag `v4.0.1` runs the build and tests, creates package version `4.0.1`, and publishes it through NuGet Trusted Publishing (GitHub OIDC). No long-lived NuGet API key is stored in GitHub Secrets.
+
+To create a release tag after reviewing and merging the changes:
+
+```bash
+git tag v4.0.1
+git push origin v4.0.1
+```
+
+Do not create a version tag until you are ready to publish that version.
