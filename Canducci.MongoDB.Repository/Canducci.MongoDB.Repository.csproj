@@ -9,13 +9,13 @@
       <RepositoryUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</RepositoryUrl>
       <RepositoryType>git</RepositoryType>
       <PackageTags>repository mongodb pagination</PackageTags>
-      <PackageReleaseNotes>Improve pagination and add Canducci.Pagination.Mvc compatibility</PackageReleaseNotes>
+      <PackageReleaseNotes>Use Canducci.Pagination as the pagination contract and base implementation</PackageReleaseNotes>
       <PackageIcon>mongo.png</PackageIcon>
       <Description>MongoDB repository with asynchronous operations and Canducci pagination support</Description>
-      <Version>3.0.0</Version>
+      <Version>4.0.0</Version>
       <PackageReadmeFile>README.md</PackageReadmeFile>
-      <AssemblyVersion>3.0.0</AssemblyVersion>
-      <FileVersion>3.0.0</FileVersion>
+      <AssemblyVersion>4.0.0</AssemblyVersion>
+      <FileVersion>4.0.0</FileVersion>
    </PropertyGroup>
    <ItemGroup>
       <PackageReference Include="Canducci.Pagination" Version="3.3.0" />
