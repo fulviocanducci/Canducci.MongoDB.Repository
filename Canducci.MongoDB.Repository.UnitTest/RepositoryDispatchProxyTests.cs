@@ -1,6 +1,6 @@
 using System.Linq;
 using Canducci.MongoDB.Repository;
-using Canducci.MongoDB.Repository.Extensions;
+using Canducci.MongoDB.Repository.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
