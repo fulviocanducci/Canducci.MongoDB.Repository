@@ -1,12 +1,22 @@
 ﻿using MongoDB.Driver.Linq;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Canducci.MongoDB.Repository.Paged
 {
    [Serializable]
    public class PagedList<T> : BasePagedList<T>
    {
+      public PagedList(IEnumerable<T> subset, int pageNumber, int pageSize, int totalItemCount)
+          : base(pageNumber, pageSize, totalItemCount)
+      {
+         if (subset != null)
+         {
+            Subset.AddRange(subset);
+         }
+      }
+
       public PagedList(IQueryable<T> superset, int pageNumber, int pageSize)
       {
          if (pageNumber < 1)
