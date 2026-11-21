@@ -94,7 +94,7 @@ namespace WebApp.Models
 }
 ```
 
-Configure dependency injection in `ConfigureServices`. Repository implementations can remain scoped:
+Configure dependency injection in `ConfigureServices`. You can register the repository using the application configuration:
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
@@ -105,6 +105,14 @@ public void ConfigureServices(IServiceCollection services)
     services.AddControllersWithViews();
 }
 ```
+
+Alternatively, provide the database name and connection string directly:
+
+```csharp
+services.AddMongoDBRepository("dbnew", "mongodb://localhost:27017");
+```
+
+Both overloads register a single `IMongoClient` instance and `IConnect` as singletons. The same MongoDB client is reused by the repository.
 
 In `controller`, import `Canducci.Pagination.Interfaces` to use the `IPaginated<T>` contract:
 
