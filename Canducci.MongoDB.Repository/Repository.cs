@@ -1,14 +1,13 @@
 ﻿using Canducci.MongoDB.Repository.Attributes;
 using Canducci.MongoDB.Repository.Paged;
+using Canducci.MongoDB.Repository.Utils;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,7 +35,10 @@ namespace Canducci.MongoDB.Repository
       { }
       public Repository(IConnect connect, MongoCollectionSettings mongoCollectionSettings)
       {
-         SetConnectAndCollectionAndBsonId(connect, mongoCollectionSettings);
+         CollectionName = RepositoryUtil.GetCollectionName<T>();
+         BsonIdName = RepositoryUtil.GetBsonIdName<T>();
+         Connect = connect;
+         Collection = RepositoryUtil.GetCollection<T>(Connect, CollectionName, mongoCollectionSettings);
       }
       #endregion
 
@@ -193,7 +195,7 @@ namespace Canducci.MongoDB.Repository
       /// <returns>Document</returns>
       public T Find<TKey>(TKey key, CancellationToken cancellationToken = default)
       {
-         return Collection.Find(GetFilterDefinition(key)).FirstOrDefault(cancellationToken);
+         return Collection.Find(RepositoryUtil.GetFilterDefinition<T, TKey>(BsonIdName, key)).FirstOrDefault(cancellationToken);
       }
       /// <summary>
       /// Find
@@ -212,7 +214,7 @@ namespace Canducci.MongoDB.Repository
       /// <returns>Document</returns>
       public async Task<T> FindAsync<TKey>(TKey key, CancellationToken cancellationToken = default)
       {
-         IAsyncCursor<T> result = await Collection.FindAsync(GetFilterDefinition(key));
+         IAsyncCursor<T> result = await Collection.FindAsync(RepositoryUtil.GetFilterDefinition<T, TKey>(BsonIdName, key));
          return await result.FirstOrDefaultAsync(cancellationToken);
       }
       /// <summary>
@@ -387,7 +389,7 @@ namespace Canducci.MongoDB.Repository
       /// <returns>bool</returns>
       public bool Delete<TKey>(TKey key, CancellationToken cancellationToken = default)
       {
-         return Collection.DeleteOne(GetFilterDefinition(key), cancellationToken).DeletedCount > 0;
+         return Collection.DeleteOne(RepositoryUtil.GetFilterDefinition<T, TKey>(BsonIdName, key), cancellationToken).DeletedCount > 0;
       }
       /// <summary>
       /// Delete a single document
@@ -397,7 +399,7 @@ namespace Canducci.MongoDB.Repository
       /// <returns>bool</returns>
       public async Task<bool> DeleteAsync<TKey>(TKey key, CancellationToken cancellationToken = default)
       {
-         DeleteResult result = await Collection.DeleteOneAsync(GetFilterDefinition(key), cancellationToken);
+         DeleteResult result = await Collection.DeleteOneAsync(RepositoryUtil.GetFilterDefinition<T, TKey>(BsonIdName, key), cancellationToken);
          return result.DeletedCount > 0;
       }
 
@@ -500,32 +502,5 @@ namespace Canducci.MongoDB.Repository
 
       #endregion
 
-      #region Internal
-      internal void SetCollectionNameAndBsonId()
-      {
-         TypeInfo typeInfo = typeof(T).GetTypeInfo();
-
-         BsonCollectionName bsonCollectionName = (BsonCollectionName)typeInfo.GetCustomAttribute(typeof(BsonCollectionName));
-         CollectionName = bsonCollectionName != null ? bsonCollectionName.Name : typeof(T).Name.ToLower();
-
-         BsonClassMap classMap = BsonClassMap.LookupClassMap(typeof(T));
-         BsonIdName = classMap.IdMemberMap?.MemberName;
-      }
-      internal void SetConnectAndCollectionAndBsonId(IConnect connect, MongoCollectionSettings mongoCollectionSettings)
-      {
-         SetCollectionNameAndBsonId();
-         Connect = connect;
-         Collection = Connect.Collection<T>(CollectionName, mongoCollectionSettings);
-      }
-      internal FilterDefinition<T> GetFilterDefinition<TKey>(TKey key)
-      {
-         if (string.IsNullOrEmpty(BsonIdName))
-         {
-            throw new ArgumentException($"'{nameof(BsonIdName)}' cannot be null or empty", nameof(BsonIdName));
-         }
-         StringFieldDefinition<T, TKey> field = new StringFieldDefinition<T, TKey>(BsonIdName);
-         return Builders<T>.Filter.Eq<TKey>(field, key);
-      }
-      #endregion
    }
 }
