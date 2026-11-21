@@ -1,7 +1,7 @@
 ﻿using Canducci.MongoDB.Repository.Attributes;
 using Canducci.MongoDB.Repository.Paged;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System;
@@ -508,8 +508,8 @@ namespace Canducci.MongoDB.Repository
          BsonCollectionName bsonCollectionName = (BsonCollectionName)typeInfo.GetCustomAttribute(typeof(BsonCollectionName));
          CollectionName = bsonCollectionName != null ? bsonCollectionName.Name : typeof(T).Name.ToLower();
 
-         var id = typeInfo.GetProperties().Where(w => w.GetCustomAttribute(typeof(BsonIdAttribute)).GetType() == typeof(BsonIdAttribute)).FirstOrDefault();
-         BsonIdName = id?.Name;
+         BsonClassMap classMap = BsonClassMap.LookupClassMap(typeof(T));
+         BsonIdName = classMap.IdMemberMap?.MemberName;
       }
       internal void SetConnectAndCollectionAndBsonId(IConnect connect, MongoCollectionSettings mongoCollectionSettings)
       {
