@@ -299,15 +299,15 @@ namespace Canducci.MongoDB.Repository.UnitTest
         [TestMethod]
         public void PagedList_ShouldRejectInvalidPageArguments()
         {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => _repository.PagedList(0, 2));
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => _repository.PagedList(1, 0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => _repository.PagedList(0, 2));
+            Assert.Throws<ArgumentOutOfRangeException>(() => _repository.PagedList(1, 0));
         }
 
         [TestMethod]
         public async Task PagedListAsync_ShouldRejectInvalidPageArguments()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(async () => await _repository.PagedListAsync(0, 2));
-            await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(async () => await _repository.PagedListAsync(1, 0));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _repository.PagedListAsync(0, 2));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _repository.PagedListAsync(1, 0));
         }
 
         [TestMethod]
@@ -323,7 +323,7 @@ namespace Canducci.MongoDB.Repository.UnitTest
         [TestMethod]
         public void CreateObjectId_ShouldRejectInvalidIdentifier()
         {
-            Assert.ThrowsException<FormatException>(() => _repository.CreateObjectId("invalid"));
+            Assert.Throws<FormatException>(() => _repository.CreateObjectId("invalid"));
         }
 
         [TestMethod]
