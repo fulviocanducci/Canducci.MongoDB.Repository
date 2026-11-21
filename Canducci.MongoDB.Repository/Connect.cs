@@ -7,7 +7,7 @@ namespace Canducci.MongoDB.Repository
    public partial class Connect : IConnect
    {
       #region private
-      private readonly MongoClient Client;
+      private readonly IMongoClient Client;
       private readonly IMongoDatabase DataBase;
       #endregion
 
@@ -19,6 +19,24 @@ namespace Canducci.MongoDB.Repository
       public IMongoCollection<T> Collection<T>(string collectionName, MongoCollectionSettings mongoCollectionSettings)
       {
          return DataBase.GetCollection<T>(collectionName, mongoCollectionSettings);
+      }
+      #endregion
+
+      #region construct_000
+      public Connect(IMongoClient client, string database)
+      {
+         if (client is null)
+         {
+            throw new ArgumentNullException(nameof(client));
+         }
+
+         if (string.IsNullOrWhiteSpace(database))
+         {
+            throw new ArgumentException("Database is required.", nameof(database));
+         }
+
+         Client = client;
+         DataBase = Client.GetDatabase(database);
       }
       #endregion
 

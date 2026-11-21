@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Canducci.MongoDB.Repository;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoDB.Driver;
 
 namespace Canducci.MongoDB.Repository.UnitTest
 {
@@ -10,17 +13,52 @@ namespace Canducci.MongoDB.Repository.UnitTest
     public class MongoDBRepositoryServiceCollectionExtensionsTests
     {
         [TestMethod]
-        public void AddMongoDBRepository_ShouldRegisterIConnectAsSingleton()
+        public void AddMongoDBRepository_WithConfiguration_ShouldRegisterClientAndConnectAsSingleton()
+        {
+            Dictionary<string, string> settings = new Dictionary<string, string>
+            {
+                ["MongoDB:Database"] = "dbnew",
+                ["MongoDB:ConnectionStrings"] = "mongodb://localhost:27017"
+            };
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(settings)
+                .Build();
+            ServiceCollection services = new ServiceCollection();
+
+            IServiceCollection result = services.AddMongoDBRepository(configuration);
+
+            ServiceDescriptor clientDescriptor = result.Single(service => service.ServiceType == typeof(IMongoClient));
+            ServiceDescriptor connectDescriptor = result.Single(service => service.ServiceType == typeof(IConnect));
+
+            Assert.AreSame(services, result);
+            Assert.AreEqual(ServiceLifetime.Singleton, clientDescriptor.Lifetime);
+            Assert.AreEqual(ServiceLifetime.Singleton, connectDescriptor.Lifetime);
+
+            using ServiceProvider provider = services.BuildServiceProvider();
+            IMongoClient client = provider.GetRequiredService<IMongoClient>();
+            IConnect connect = provider.GetRequiredService<IConnect>();
+
+            Assert.IsNotNull(connect);
+            Assert.AreSame(client, provider.GetRequiredService<IMongoClient>());
+        }
+
+        [TestMethod]
+        public void AddMongoDBRepository_WithDatabaseAndConnectionString_ShouldRegisterClientAndConnectAsSingleton()
         {
             ServiceCollection services = new ServiceCollection();
 
-            IServiceCollection result = services.AddMongoDBRepository();
+            IServiceCollection result = services.AddMongoDBRepository("dbnew", "mongodb://localhost:27017");
 
-            ServiceDescriptor descriptor = result.Single(service => service.ServiceType == typeof(IConnect));
+            ServiceDescriptor clientDescriptor = result.Single(service => service.ServiceType == typeof(IMongoClient));
+            ServiceDescriptor connectDescriptor = result.Single(service => service.ServiceType == typeof(IConnect));
 
             Assert.AreSame(services, result);
-            Assert.AreEqual(ServiceLifetime.Singleton, descriptor.Lifetime);
-            Assert.AreEqual(typeof(Connect), descriptor.ImplementationType);
+            Assert.AreEqual(ServiceLifetime.Singleton, clientDescriptor.Lifetime);
+            Assert.AreEqual(ServiceLifetime.Singleton, connectDescriptor.Lifetime);
+
+            using ServiceProvider provider = services.BuildServiceProvider();
+            Assert.IsNotNull(provider.GetRequiredService<IConnect>());
+            Assert.IsNotNull(provider.GetRequiredService<IMongoClient>());
         }
 
         [TestMethod]
@@ -28,7 +66,36 @@ namespace Canducci.MongoDB.Repository.UnitTest
         {
             IServiceCollection services = null;
 
-            Assert.Throws<ArgumentNullException>(() => services.AddMongoDBRepository());
+            Assert.Throws<ArgumentNullException>(() =>
+                services.AddMongoDBRepository("dbnew", "mongodb://localhost:27017"));
+        }
+
+        [TestMethod]
+        public void AddMongoDBRepository_WhenConfigurationIsNull_ShouldThrowArgumentNullException()
+        {
+            ServiceCollection services = new ServiceCollection();
+            IConfiguration configuration = null;
+
+            Assert.Throws<ArgumentNullException>(() =>
+                services.AddMongoDBRepository(configuration));
+        }
+
+        [TestMethod]
+        public void AddMongoDBRepository_WhenDatabaseIsMissing_ShouldThrowArgumentException()
+        {
+            ServiceCollection services = new ServiceCollection();
+
+            Assert.Throws<ArgumentException>(() =>
+                services.AddMongoDBRepository(null, "mongodb://localhost:27017"));
+        }
+
+        [TestMethod]
+        public void AddMongoDBRepository_WhenConnectionStringIsMissing_ShouldThrowArgumentException()
+        {
+            ServiceCollection services = new ServiceCollection();
+
+            Assert.Throws<ArgumentException>(() =>
+                services.AddMongoDBRepository("dbnew", null));
         }
     }
 }

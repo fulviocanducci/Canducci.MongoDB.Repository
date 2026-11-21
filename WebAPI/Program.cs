@@ -13,7 +13,7 @@ namespace WebAPI
          // 
          builder.Services.AddControllers();
          builder.Services.AddOpenApi();
-         builder.Services.AddMongoDBRepository();
+         builder.Services.AddMongoDBRepository(configuration);
          builder.Services.AddScoped<PeopleRepositoryAbstract, PeopleRepository>();
          builder.Services.Configure<RouteOptions>(configuration =>
          {

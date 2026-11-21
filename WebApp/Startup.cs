@@ -19,7 +19,7 @@ namespace WebApp
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMongoDBRepository();
+            services.AddMongoDBRepository(Configuration);
             services.AddScoped<RepositoryPersonImplementation, RepositoryPerson>();
             services.AddScoped<RepositoryCarImplementation, RepositoryCar>();
 
