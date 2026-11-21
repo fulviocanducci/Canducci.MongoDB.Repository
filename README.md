@@ -82,12 +82,12 @@ namespace WebApp.Models
 }
 ```
 
-Configure `Startup.cs` in method `ConfigureServices`:
+Configure `Startup.cs` in method `ConfigureServices`. Register `IConnect` as a singleton so the application reuses the same `MongoClient` and its connection pools across requests. Repository implementations can remain scoped:
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddScoped<IConnect, Connect>();
+    services.AddSingleton<IConnect, Connect>();
     services.AddScoped<RepositoryPersonImplementation, RepositoryPerson>();
 
     services.AddControllersWithViews();
