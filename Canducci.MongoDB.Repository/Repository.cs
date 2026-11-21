@@ -285,7 +285,8 @@ namespace Canducci.MongoDB.Repository
       /// <returns>IEnumerable Document</returns>
       public async Task<IEnumerable<T>> AllAsync<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
       {
-         SortDefinition<T> sort = Builders<T>.Sort.Ascending(orderBy);
+         FieldDefinition<T> field = new ExpressionFieldDefinition<T, Tkey>(orderBy);
+         SortDefinition<T> sort = Builders<T>.Sort.Ascending(field);
          return await Collection.Find(filter).Sort(sort).ToListAsync();
       }
       #endregion
@@ -317,7 +318,8 @@ namespace Canducci.MongoDB.Repository
          IFindFluent<T, T> query = filter != null
              ? Collection.Find(filter)
              : Collection.Find(Builders<T>.Filter.Empty);
-         SortDefinition<T> sort = Builders<T>.Sort.Ascending(orderBy);
+         FieldDefinition<T> field = new ExpressionFieldDefinition<T, Tkey>(orderBy);
+         SortDefinition<T> sort = Builders<T>.Sort.Ascending(field);
          return await query.Sort(sort).ToListAsync();
       }
       #endregion
@@ -462,7 +464,7 @@ namespace Canducci.MongoDB.Repository
       {
          return await CreatePagedListAsync(
              Builders<T>.Filter.Empty,
-             Builders<T>.Sort.Ascending(orderBy),
+             Builders<T>.Sort.Ascending(new ExpressionFieldDefinition<T, Tkey>(orderBy)),
              pageNumber,
              pageSize);
       }
@@ -492,7 +494,7 @@ namespace Canducci.MongoDB.Repository
       {
          return await CreatePagedListAsync(
              Builders<T>.Filter.Where(filter),
-             Builders<T>.Sort.Ascending(orderBy),
+             Builders<T>.Sort.Ascending(new ExpressionFieldDefinition<T, Tkey>(orderBy)),
              pageNumber,
              pageSize);
       }
