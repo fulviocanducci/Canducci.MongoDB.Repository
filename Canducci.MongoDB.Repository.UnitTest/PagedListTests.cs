@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Canducci.MongoDB.Repository.Paged;
+using Canducci.Pagination.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Canducci.MongoDB.Repository.UnitTest
@@ -25,6 +26,54 @@ namespace Canducci.MongoDB.Repository.UnitTest
             Assert.IsTrue(pagedList.HasNextPage);
             Assert.AreEqual(4, pagedList.FirstItemOnPage);
             Assert.AreEqual(6, pagedList.LastItemOnPage);
+        }
+
+        [TestMethod]
+        public void Constructor_ShouldImplementCanducciPaginatedContract()
+        {
+            IPaginated<string> paginated = new PagedList<string>(
+                new List<string> { "item-1", "item-2" },
+                1,
+                2,
+                10);
+
+            Assert.AreEqual(5, paginated.PageCount);
+            Assert.AreEqual(8, paginated.MaximumPageNumbersToDisplay);
+            Assert.IsTrue(paginated.IsFirstPage);
+            Assert.IsTrue(paginated.HasNextPage);
+            Assert.IsTrue(paginated.Pages.Contains(1));
+            Assert.IsTrue(paginated.Pages.Contains(5));
+        }
+
+        [TestMethod]
+        public void SetPages_ShouldRebuildVisiblePageNumbers()
+        {
+            IPaginated<string> paginated = new PagedList<string>(
+                new List<string> { "item-5", "item-6" },
+                5,
+                2,
+                20);
+
+            paginated.SetPages(4);
+
+            CollectionAssert.AreEqual(
+                new[] { 3, 4, 5, 6, 7 },
+                new List<int>(paginated.Pages));
+        }
+
+        [TestMethod]
+        public void PagedList_ShouldBeUsableAsMvcPaginationModel()
+        {
+            PagedList<string> pagedList = new PagedList<string>(
+                new List<string> { "item-1" },
+                1,
+                10,
+                20);
+
+            IPaginated<string> mvcModel = pagedList;
+
+            Assert.AreEqual(2, mvcModel.PageCount);
+            Assert.AreEqual(1, mvcModel.PageNumber);
         }
 
         [TestMethod]
