@@ -7,8 +7,8 @@ namespace Canducci.MongoDB.Repository
    public partial class Connect : IConnect
    {
       #region private
-      private MongoClient Client { get; set; }
-      private IMongoDatabase DataBase { get; set; }
+      private readonly MongoClient Client;
+      private readonly IMongoDatabase DataBase;
       #endregion
 
       #region collection
@@ -33,8 +33,21 @@ namespace Canducci.MongoDB.Repository
             throw new ArgumentNullException(nameof(configuration));
          }
          IConfigurationSection section = configuration.GetSection("MongoDB");
-         Client = new MongoClient(section["ConnectionStrings"]);
-         DataBase = Client.GetDatabase(section["Database"], mongoDatabaseSettings);
+         string connectionString = section["ConnectionStrings"];
+         string database = section["Database"];
+
+         if (string.IsNullOrWhiteSpace(connectionString))
+         {
+            throw new InvalidOperationException("The MongoDB:ConnectionStrings configuration value is required.");
+         }
+
+         if (string.IsNullOrWhiteSpace(database))
+         {
+            throw new InvalidOperationException("The MongoDB:Database configuration value is required.");
+         }
+
+         Client = new MongoClient(connectionString);
+         DataBase = Client.GetDatabase(database, mongoDatabaseSettings);
       }
       #endregion
 
