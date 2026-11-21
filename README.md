@@ -28,7 +28,7 @@ Install-Package Canducci.MongoDB.Repository
 
 ## Configuration
 
-The dependency injection extension methods are defined in the `Canducci.MongoDB.Repository.Extensions` namespace, in the `MongoDBRepositoryServiceCollectionExtension` class. Add `using Canducci.MongoDB.Repository.Extensions;` wherever `AddMongoDBRepository` is called.
+The dependency injection extension methods are defined in the `Canducci.MongoDB.Repository.DependencyInjection` namespace, in the `MongoDBRepositoryServiceCollectionExtensions` class. Add `using Canducci.MongoDB.Repository.DependencyInjection;` wherever `AddMongoDBRepository` is called.
 
 Add the MongoDB settings to your `appsettings.json`:
 
@@ -50,7 +50,7 @@ The `MongoDB:Proxy` setting controls automatic repository interface registration
 Register using `IConfiguration`; the `Proxy` value is read from `appsettings.json`. Import the extension namespace:
 
 ```csharp
-using Canducci.MongoDB.Repository.Extensions;
+using Canducci.MongoDB.Repository.DependencyInjection;
 
 builder.Services.AddMongoDBRepository(builder.Configuration);
 ```
@@ -59,7 +59,7 @@ You can also configure the registration explicitly through the action overload:
 
 ```csharp
 using Canducci.MongoDB.Repository;
-using Canducci.MongoDB.Repository.Extensions;
+using Canducci.MongoDB.Repository.DependencyInjection;
 
 services.AddMongoDBRepository(configuration =>
 {
@@ -72,7 +72,7 @@ services.AddMongoDBRepository(configuration =>
 Or provide the database name and connection string directly. This overload uses `Manual` mode:
 
 ```csharp
-using Canducci.MongoDB.Repository.Extensions;
+using Canducci.MongoDB.Repository.DependencyInjection;
 
 builder.Services.AddMongoDBRepository("dbnew", "mongodb://localhost:27017");
 ```
