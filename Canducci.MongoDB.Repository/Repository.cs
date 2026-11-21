@@ -285,7 +285,8 @@ namespace Canducci.MongoDB.Repository
       /// <returns>IEnumerable Document</returns>
       public async Task<IEnumerable<T>> AllAsync<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
       {
-         return await Collection.Find(filter).SortBy(orderBy).ToListAsync();
+         SortDefinition<T> sort = Builders<T>.Sort.Ascending(orderBy);
+         return await Collection.Find(filter).Sort(sort).ToListAsync();
       }
       #endregion
 
@@ -316,7 +317,8 @@ namespace Canducci.MongoDB.Repository
          IFindFluent<T, T> query = filter != null
              ? Collection.Find(filter)
              : Collection.Find(Builders<T>.Filter.Empty);
-         return await query.SortBy(orderBy).ToListAsync();
+         SortDefinition<T> sort = Builders<T>.Sort.Ascending(orderBy);
+         return await query.Sort(sort).ToListAsync();
       }
       #endregion
 
