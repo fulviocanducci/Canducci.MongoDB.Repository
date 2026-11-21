@@ -8,7 +8,7 @@ namespace Canducci.MongoDB.Repository.Utils
 {
     internal static class RepositoryUtil
     {
-        public static string GetCollectionName<T>()
+        internal static string GetCollectionName<T>()
         {
             TypeInfo typeInfo = typeof(T).GetTypeInfo();
             BsonCollectionName bsonCollectionName = (BsonCollectionName)typeInfo.GetCustomAttribute(typeof(BsonCollectionName));
