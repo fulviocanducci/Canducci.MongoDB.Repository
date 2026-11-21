@@ -1,4 +1,4 @@
-﻿using Canducci.MongoDB.Repository.Paged;
+﻿using Canducci.Pagination.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -18,7 +18,7 @@ namespace WebApp.Controllers
         public async Task<IActionResult> Index(int? page)
         {
             int total = 5;
-            IPagedList<Person> data = await Repository
+            IPaginated<Person> data = await Repository
                 .PagedListAsync(page ?? 1, total, w => w.Id != null && w.Name != null, x => x.Name);
             return View(data);
         }

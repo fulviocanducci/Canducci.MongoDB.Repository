@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Canducci.MongoDB.Repository.Paged;
+using Canducci.MongoDB.Repository;
 using Canducci.Pagination.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -44,18 +44,6 @@ namespace Canducci.MongoDB.Repository.UnitTest
             Assert.IsTrue(paginated.HasNextPage);
             Assert.IsTrue(paginated.Pages.Contains(1));
             Assert.IsTrue(paginated.Pages.Contains(5));
-
-            IPagedList<string> pagedList = new PagedList<string>(
-                new List<string> { "item-2" },
-                2,
-                2,
-                10);
-
-            Assert.IsTrue(pagedList.HasPreviousPage);
-            Assert.IsTrue(pagedList.HasNextPage);
-
-            IPagedList metadata = pagedList;
-            Assert.AreEqual(5, metadata.PageCount);
         }
 
         [TestMethod]
@@ -75,32 +63,29 @@ namespace Canducci.MongoDB.Repository.UnitTest
         }
 
         [TestMethod]
-        public void PagedList_ShouldBeUsableAsMvcPaginationModel()
-        {
-            PagedList<string> pagedList = new PagedList<string>(
-                new List<string> { "item-1" },
-                1,
-                10,
-                20);
-
-            IPaginated<string> mvcModel = pagedList;
-
-            Assert.AreEqual(2, mvcModel.PageCount);
-            Assert.AreEqual(1, mvcModel.PageNumber);
-        }
-
-        [TestMethod]
-        public void QueryableConstructor_ShouldInitializePageNumbers()
+        public void ToPagedList_ShouldCreatePaginatedResultFromQueryable()
         {
             List<string> items = new List<string>
             {
                 "item-1", "item-2", "item-3", "item-4", "item-5"
             };
 
-            PagedList<string> pagedList = new PagedList<string>(items.AsQueryable(), 2, 2);
+            IPaginated<string> paginated = items.AsQueryable().ToPagedList(2, 2);
 
-            Assert.AreEqual(3, pagedList.PageCount);
-            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, new List<int>(pagedList.Pages));
+            Assert.AreEqual(3, paginated.PageCount);
+            Assert.AreEqual(5, paginated.TotalItemCount);
+            Assert.AreEqual(2, paginated.Count);
+            Assert.AreEqual("item-3", paginated.First());
+        }
+
+        [TestMethod]
+        public void Constructor_ShouldAcceptNullSubsetAsEmptyCollection()
+        {
+            PagedList<string> pagedList = new PagedList<string>(null, 1, 10, 0);
+
+            Assert.AreEqual(0, pagedList.Count);
+            Assert.AreEqual(0, pagedList.TotalItemCount);
+            Assert.AreEqual(0, pagedList.PageCount);
         }
 
         [TestMethod]
@@ -115,6 +100,13 @@ namespace Canducci.MongoDB.Repository.UnitTest
         {
             Assert.ThrowsException<ArgumentOutOfRangeException>(
                 () => new PagedList<string>(new List<string>(), 1, 0, 0));
+        }
+
+        [TestMethod]
+        public void Constructor_ShouldRejectNegativeTotalItemCount()
+        {
+            Assert.ThrowsException<ArgumentOutOfRangeException>(
+                () => new PagedList<string>(new List<string>(), 1, 10, -1));
         }
     }
 }

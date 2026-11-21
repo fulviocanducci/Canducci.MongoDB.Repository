@@ -1,5 +1,5 @@
 ﻿using Canducci.MongoDB.Repository.Attributes;
-using Canducci.MongoDB.Repository.Paged;
+using Canducci.Pagination.Interfaces;
 using Canducci.MongoDB.Repository.Utils;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -422,87 +422,106 @@ namespace Canducci.MongoDB.Repository
 
       #region paged
       /// <summary>
-      /// Paging documents
+      /// Returns a page of documents.
       /// </summary>
-      /// <param name="pageNumber">Page number</param>
-      /// <param name="pageSize">Page size</param>
-      /// <returns>IPagedList</returns>
-      public IPagedList<T> PagedList(int pageNumber, int pageSize)
+      public IPaginated<T> PagedList(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
       {
-         return Query().ToPagedList<T>(pageNumber, pageSize);
+         return CreatePagedList(Builders<T>.Filter.Empty, null, pageNumber, pageSize, cancellationToken);
       }
+
       /// <summary>
-      /// Paging documents
+      /// Returns a page of documents asynchronously.
       /// </summary>
-      /// <param name="pageNumber">Page number</param>
-      /// <param name="pageSize">Page size</param>
-      /// <returns>IPagedList</returns>
-      public async Task<IPagedList<T>> PagedListAsync(int pageNumber, int pageSize)
+      public Task<IPaginated<T>> PagedListAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
       {
-         return await CreatePagedListAsync(Builders<T>.Filter.Empty, null, pageNumber, pageSize);
+         return CreatePagedListAsync(Builders<T>.Filter.Empty, null, pageNumber, pageSize, cancellationToken);
       }
+
       /// <summary>
-      /// Paging documents
+      /// Returns an ordered page of documents.
       /// </summary>
-      /// <param name="pageNumber">Page number</param>
-      /// <param name="pageSize">Page size</param>
-      /// <param name="orderBy">Parameter orderBy</param>
-      /// <returns>IPagedList</returns>
-      public IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy)
+      public IPaginated<T> PagedList<TKey>(int pageNumber, int pageSize, Expression<Func<T, TKey>> orderBy, CancellationToken cancellationToken = default)
       {
-         return Query().OrderBy(orderBy).ToPagedList<T>(pageNumber, pageSize);
+         SortDefinition<T> sort = Builders<T>.Sort.Ascending(new ExpressionFieldDefinition<T, TKey>(orderBy));
+         return CreatePagedList(Builders<T>.Filter.Empty, sort, pageNumber, pageSize, cancellationToken);
       }
+
       /// <summary>
-      /// Paging documents
+      /// Returns an ordered page of documents asynchronously.
       /// </summary>
-      /// <typeparam name="Tkey">Parameter type</typeparam>
-      /// <param name="pageNumber">Page number</param>
-      /// <param name="pageSize">Page size</param>
-      /// <param name="orderBy">Parameter orderBy</param>
-      /// <returns>IPagedList</returns>
-      public async Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy)
+      public Task<IPaginated<T>> PagedListAsync<TKey>(int pageNumber, int pageSize, Expression<Func<T, TKey>> orderBy, CancellationToken cancellationToken = default)
       {
-         return await CreatePagedListAsync(
-             Builders<T>.Filter.Empty,
-             Builders<T>.Sort.Ascending(new ExpressionFieldDefinition<T, Tkey>(orderBy)),
-             pageNumber,
-             pageSize);
+         SortDefinition<T> sort = Builders<T>.Sort.Ascending(new ExpressionFieldDefinition<T, TKey>(orderBy));
+         return CreatePagedListAsync(Builders<T>.Filter.Empty, sort, pageNumber, pageSize, cancellationToken);
       }
+
       /// <summary>
-      /// Paging documents
+      /// Returns a filtered and ordered page of documents.
       /// </summary>
-      /// <typeparam name="Tkey">Parameter type</typeparam>
-      /// <param name="pageNumber">Page number</param>
-      /// <param name="pageSize">Page size</param>
-      /// <param name="filter">Parameter filter</param>
-      /// <param name="orderBy">Parameter orderBy</param>
-      /// <returns>IPagedList</returns>
-      public IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
+      public IPaginated<T> PagedList<TKey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, TKey>> orderBy, CancellationToken cancellationToken = default)
       {
-         return Query().Where(filter).OrderBy(orderBy).ToPagedList<T>(pageNumber, pageSize);
+         FilterDefinition<T> filterDefinition = Builders<T>.Filter.Where(filter);
+         SortDefinition<T> sort = Builders<T>.Sort.Ascending(new ExpressionFieldDefinition<T, TKey>(orderBy));
+         return CreatePagedList(filterDefinition, sort, pageNumber, pageSize, cancellationToken);
       }
+
       /// <summary>
-      /// Paging documents
+      /// Returns a filtered and ordered page of documents asynchronously.
       /// </summary>
-      /// <typeparam name="Tkey">Parameter type</typeparam>
-      /// <param name="pageNumber">Page number</param>
-      /// <param name="pageSize">Page size</param>
-      /// <param name="filter">Parameter filter</param>
-      /// <param name="orderBy">Parameter orderBy</param>
-      /// <returns>IPagedList</returns>
-      public async Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
+      public Task<IPaginated<T>> PagedListAsync<TKey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, TKey>> orderBy, CancellationToken cancellationToken = default)
       {
-         return await CreatePagedListAsync(
-             Builders<T>.Filter.Where(filter),
-             Builders<T>.Sort.Ascending(new ExpressionFieldDefinition<T, Tkey>(orderBy)),
-             pageNumber,
-             pageSize);
+         FilterDefinition<T> filterDefinition = Builders<T>.Filter.Where(filter);
+         SortDefinition<T> sort = Builders<T>.Sort.Ascending(new ExpressionFieldDefinition<T, TKey>(orderBy));
+         return CreatePagedListAsync(filterDefinition, sort, pageNumber, pageSize, cancellationToken);
       }
-      private async Task<IPagedList<T>> CreatePagedListAsync(
+
+      private IPaginated<T> CreatePagedList(
           FilterDefinition<T> filter,
           SortDefinition<T> sort,
           int pageNumber,
-          int pageSize)
+          int pageSize,
+          CancellationToken cancellationToken)
+      {
+         ValidatePageArguments(pageNumber, pageSize);
+         long totalItemCount = Collection.CountDocuments(filter, cancellationToken: cancellationToken);
+         IFindFluent<T, T> query = Collection.Find(filter);
+         if (sort != null)
+         {
+            query = query.Sort(sort);
+         }
+
+         List<T> items = query
+             .Skip(checked((pageNumber - 1) * pageSize))
+             .Limit(pageSize)
+             .ToList(cancellationToken);
+
+         return new PagedList<T>(items, pageNumber, pageSize, checked((int)totalItemCount));
+      }
+
+      private async Task<IPaginated<T>> CreatePagedListAsync(
+          FilterDefinition<T> filter,
+          SortDefinition<T> sort,
+          int pageNumber,
+          int pageSize,
+          CancellationToken cancellationToken)
+      {
+         ValidatePageArguments(pageNumber, pageSize);
+         long totalItemCount = await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+         IFindFluent<T, T> query = Collection.Find(filter);
+         if (sort != null)
+         {
+            query = query.Sort(sort);
+         }
+
+         List<T> items = await query
+             .Skip(checked((pageNumber - 1) * pageSize))
+             .Limit(pageSize)
+             .ToListAsync(cancellationToken);
+
+         return new PagedList<T>(items, pageNumber, pageSize, checked((int)totalItemCount));
+      }
+
+      private static void ValidatePageArguments(int pageNumber, int pageSize)
       {
          if (pageNumber < 1)
          {
@@ -512,22 +531,7 @@ namespace Canducci.MongoDB.Repository
          {
             throw new ArgumentOutOfRangeException(nameof(pageSize), pageSize, "PageSize cannot be less than 1.");
          }
-
-         long totalItemCount = await Collection.CountDocumentsAsync(filter);
-         IFindFluent<T, T> query = Collection.Find(filter);
-         if (sort != null)
-         {
-            query = query.Sort(sort);
-         }
-
-         List<T> items = await query
-             .Skip((pageNumber - 1) * pageSize)
-             .Limit(pageSize)
-             .ToListAsync();
-
-         return new PagedList<T>(items, pageNumber, pageSize, checked((int)totalItemCount));
       }
-
       #endregion
 
       #region objectId

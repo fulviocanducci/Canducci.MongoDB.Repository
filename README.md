@@ -94,7 +94,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-In `controller`:
+In `controller`, import `Canducci.Pagination.Interfaces` to use the `IPaginated<T>` contract:
 
 ```csharp
 public class PersonController : Controller
@@ -196,7 +196,7 @@ In `controller`:
 public async Task<IActionResult> Index(int? page)
 {
     const int pageSize = 5;
-    IPagedList<Person> data = await Repository
+    IPaginated<Person> data = await Repository
         .PagedListAsync(page ?? 1, pageSize);
     return View(data);
 }
@@ -205,7 +205,8 @@ public async Task<IActionResult> Index(int? page)
 In `View`:
 
 ```cshtml
-@model Canducci.MongoDB.Repository.Paged.IPagedList<WebApp.Models.Person>
+@using Canducci.Pagination.Interfaces
+@model IPaginated<WebApp.Models.Person>
 
 @{
     ViewData["Title"] = "Index";
@@ -247,7 +248,7 @@ In `View`:
 
 #### Integration with Canducci.Pagination.Mvc
 
-The repository pagination result implements `Canducci.Pagination.Interfaces.IPaginated<T>`. You can therefore pass the same `IPagedList<T>` directly to the HTML helper provided by `Canducci.Pagination.Mvc`, without converting the result or loading the collection into memory again.
+The repository pagination result implements `Canducci.Pagination.Interfaces.IPaginated<T>`. You can therefore pass the same `IPaginated<T>` directly to the HTML helper provided by `Canducci.Pagination.Mvc`, without converting the result or loading the collection into memory again.
 
 Install `Canducci.Pagination.Mvc` in your ASP.NET Core MVC application:
 
@@ -260,7 +261,7 @@ In your Razor View:
 ```cshtml
 @using Canducci.Pagination.Mvc
 @using Canducci.Pagination.Interfaces
-@model Canducci.MongoDB.Repository.Paged.IPagedList<WebApp.Models.Person>
+@model IPaginated<WebApp.Models.Person>
 
 @Html.Pagination(
     Model,
