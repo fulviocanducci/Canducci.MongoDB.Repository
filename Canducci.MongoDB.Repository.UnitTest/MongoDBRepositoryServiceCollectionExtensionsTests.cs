@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Canducci.MongoDB.Repository;
-using Canducci.MongoDB.Repository.Extensions;
+using Canducci.MongoDB.Repository.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,7 +11,7 @@ using MongoDB.Driver;
 namespace Canducci.MongoDB.Repository.UnitTest
 {
     [TestClass]
-    public class MongoDBRepositoryServiceCollectionExtensionTests
+    public class MongoDBRepositoryServiceCollectionExtensionsTests
     {
         [TestMethod]
         public void AddMongoDBRepository_WithConfiguration_ShouldRegisterClientAndConnectAsSingleton()

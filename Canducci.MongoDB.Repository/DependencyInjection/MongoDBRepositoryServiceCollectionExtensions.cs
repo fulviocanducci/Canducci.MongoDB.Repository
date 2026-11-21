@@ -6,9 +6,9 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Canducci.MongoDB.Repository.Extensions
+namespace Canducci.MongoDB.Repository.DependencyInjection
 {
-    public static class MongoDBRepositoryServiceCollectionExtension
+    public static class MongoDBRepositoryServiceCollectionExtensions
     {
         public static IServiceCollection AddMongoDBRepository(
             this IServiceCollection services,
