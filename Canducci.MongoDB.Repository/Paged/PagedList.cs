@@ -21,11 +21,11 @@ namespace Canducci.MongoDB.Repository.Paged
       {
          if (pageNumber < 1)
          {
-            throw new ArgumentOutOfRangeException("pageNumber", pageNumber, "PageNumber cannot be below 1.");
+            throw new ArgumentOutOfRangeException(nameof(pageNumber), pageNumber, "PageNumber cannot be below 1.");
          }
          if (pageSize < 1)
          {
-            throw new ArgumentOutOfRangeException("pageSize", pageSize, "PageSize cannot be less than 1.");
+            throw new ArgumentOutOfRangeException(nameof(pageSize), pageSize, "PageSize cannot be less than 1.");
          }
 
          TotalItemCount = superset == null ? 0 : superset.Count();
@@ -37,11 +37,10 @@ namespace Canducci.MongoDB.Repository.Paged
          IsFirstPage = PageNumber == 1;
          IsLastPage = PageNumber >= PageCount;
          FirstItemOnPage = (PageNumber - 1) * PageSize + 1;
-         var numberOfLastItemOnPage = FirstItemOnPage + PageSize - 1;
+         int numberOfLastItemOnPage = FirstItemOnPage + PageSize - 1;
          LastItemOnPage = numberOfLastItemOnPage > TotalItemCount
                          ? TotalItemCount
                          : numberOfLastItemOnPage;
-
 
          if (superset != null && TotalItemCount > 0)
          {
@@ -50,7 +49,8 @@ namespace Canducci.MongoDB.Repository.Paged
                 : superset.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList()
             );
          }
+
+         SetPages();
       }
    }
-
 }
