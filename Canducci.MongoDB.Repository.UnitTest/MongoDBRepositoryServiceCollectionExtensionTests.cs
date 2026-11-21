@@ -11,7 +11,7 @@ using MongoDB.Driver;
 namespace Canducci.MongoDB.Repository.UnitTest
 {
     [TestClass]
-    public class MongoDBRepositoryServiceCollectionExtensionsTests
+    public class MongoDBRepositoryServiceCollectionExtensionTests
     {
         [TestMethod]
         public void AddMongoDBRepository_WithConfiguration_ShouldRegisterClientAndConnectAsSingleton()
