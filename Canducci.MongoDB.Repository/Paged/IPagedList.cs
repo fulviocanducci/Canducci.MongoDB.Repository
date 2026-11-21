@@ -1,4 +1,4 @@
-﻿using Canducci.Pagination.Interfaces;
+using Canducci.Pagination.Interfaces;
 
 namespace Canducci.MongoDB.Repository.Paged
 {
@@ -7,17 +7,7 @@ namespace Canducci.MongoDB.Repository.Paged
         IPagedList GetMetaData();
     }
 
-    public interface IPagedList
+    public interface IPagedList : IPaginatedRest
     {
-        int PageCount { get; }
-        int TotalItemCount { get; }
-        int PageNumber { get; }
-        int PageSize { get; }
-        bool HasPreviousPage { get; }
-        bool HasNextPage { get; }
-        bool IsFirstPage { get; }
-        bool IsLastPage { get; }
-        int FirstItemOnPage { get; }
-        int LastItemOnPage { get; }
     }
 }
