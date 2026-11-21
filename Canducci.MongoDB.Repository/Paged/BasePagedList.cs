@@ -149,7 +149,7 @@ namespace Canducci.MongoDB.Repository.Paged
             GC.SuppressFinalize(this);
         }
 
-        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             return Subset.GetEnumerator();
         }
