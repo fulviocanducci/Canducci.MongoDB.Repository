@@ -28,7 +28,7 @@ namespace Canducci.MongoDB.Repository.UnitTest
         {
             IServiceCollection services = null;
 
-            Assert.ThrowsException<ArgumentNullException>(() => services.AddMongoDBRepository());
+            Assert.Throws<ArgumentNullException>(() => services.AddMongoDBRepository());
         }
     }
 }
