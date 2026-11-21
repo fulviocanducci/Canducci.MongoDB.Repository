@@ -83,7 +83,38 @@ The `BsonCollectionName` attribute defines the MongoDB collection name. If it is
 
 ## Repository
 
-Create an abstract repository and its concrete implementation:
+### Automatic repository interfaces
+
+For repositories that only use the operations provided by `IRepository<T>`, declare an empty interface:
+
+```csharp
+public interface IRepositoryPerson : IRepository<Person>
+{
+}
+```
+
+The `AddMongoDBRepository` registration scans the assemblies already loaded by the application and automatically registers public, empty interfaces that directly inherit from one closed `IRepository<TEntity>` contract.
+
+Inject the interface directly:
+
+```csharp
+public class PersonService
+{
+    private readonly IRepositoryPerson _repository;
+
+    public PersonService(IRepositoryPerson repository)
+    {
+        _repository = repository;
+    }
+}
+```
+
+The generated interface proxy forwards calls to the library's concrete internal repository implementation. These registrations use the scoped lifetime. Interfaces that declare additional methods are intentionally not registered by this mechanism.
+
+### Traditional repository implementations
+
+The traditional inheritance and registration model remains supported. Create an abstract repository and its concrete implementation:
+
 
 ```csharp
 using Canducci.MongoDB.Repository;
