@@ -1,15 +1,9 @@
-﻿using MongoDB.Driver.Linq;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Canducci.Pagination.Interfaces;
 
 namespace Canducci.MongoDB.Repository.Paged
 {
-    public interface IPagedList<T> : IPagedList, IEnumerable<T>
+    public interface IPagedList<T> : IPagedList, IPaginated<T>
     {
-        T this[int index] { get; }
-        int Count { get; }
         IPagedList GetMetaData();
     }
 
@@ -26,5 +20,4 @@ namespace Canducci.MongoDB.Repository.Paged
         int FirstItemOnPage { get; }
         int LastItemOnPage { get; }
     }
-
 }
