@@ -51,7 +51,7 @@ namespace Canducci.MongoDB.Repository.UnitTest
         {
             IQueryable<int> source = null;
 
-            Assert.ThrowsException<ArgumentNullException>(() => source.ToPagedList(1, 10));
+            Assert.Throws<ArgumentNullException>(() => source.ToPagedList(1, 10));
         }
 
         [TestMethod]
@@ -59,7 +59,7 @@ namespace Canducci.MongoDB.Repository.UnitTest
         {
             IQueryable<int> source = new[] { 1, 2, 3 }.AsQueryable();
 
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => source.ToPagedList(0, 2));
+            Assert.Throws<ArgumentOutOfRangeException>(() => source.ToPagedList(0, 2));
         }
 
         [TestMethod]
@@ -67,7 +67,7 @@ namespace Canducci.MongoDB.Repository.UnitTest
         {
             IQueryable<int> source = new[] { 1, 2, 3 }.AsQueryable();
 
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => source.ToPagedList(1, 0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => source.ToPagedList(1, 0));
         }
     }
 }
