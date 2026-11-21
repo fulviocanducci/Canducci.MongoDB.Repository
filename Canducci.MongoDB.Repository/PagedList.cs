@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace Canducci.MongoDB.Repository
 {
-    [Serializable]
     public sealed class PagedList<T> : PaginatedBase<T>
     {
         public PagedList(IEnumerable<T> subset, int pageNumber, int pageSize, int totalItemCount)
