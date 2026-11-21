@@ -74,7 +74,7 @@ namespace Canducci.MongoDB.Repository.UnitTest
 
             Assert.AreEqual(3, paginated.PageCount);
             Assert.AreEqual(5, paginated.TotalItemCount);
-            Assert.AreEqual(2, paginated.Count);
+            Assert.AreEqual(2, ((ICollection<string>)paginated).Count);
             Assert.AreEqual("item-3", paginated.First());
         }
 
