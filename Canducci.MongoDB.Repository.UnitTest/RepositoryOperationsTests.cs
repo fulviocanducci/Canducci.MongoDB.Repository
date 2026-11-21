@@ -155,6 +155,97 @@ namespace Canducci.MongoDB.Repository.UnitTest
         }
 
         [TestMethod]
+        public void AllAndList_ShouldApplyFiltersAndAscendingSort()
+        {
+            SeedDocuments();
+
+            IReadOnlyList<TestDocument> all = _repository.All(x => x.Category == "A", x => x.Name);
+            IReadOnlyList<TestDocument> list = _repository.List(x => x.Name, x => x.Category == "B");
+
+            Assert.AreEqual(3, all.Count);
+            Assert.AreEqual("Alpha", all[0].Name);
+            Assert.AreEqual("Charlie", all[1].Name);
+            Assert.AreEqual("Echo", all[2].Name);
+            Assert.AreEqual(2, list.Count);
+            Assert.AreEqual("Bravo", list[0].Name);
+            Assert.AreEqual("Delta", list[1].Name);
+        }
+
+        [TestMethod]
+        public async Task ListAsync_ShouldApplyFilterAndAscendingSort()
+        {
+            SeedDocuments();
+
+            IReadOnlyList<TestDocument> list = await _repository.ListAsync(x => x.Name, x => x.Category == "B");
+
+            Assert.AreEqual(2, list.Count);
+            Assert.AreEqual("Bravo", list[0].Name);
+            Assert.AreEqual("Delta", list[1].Name);
+        }
+
+        [TestMethod]
+        public void Update_WhenNoDocumentsMatch_ReturnsZeroCounts()
+        {
+            UpdateResult result = _repository.Update(
+                x => x.Name == "Missing",
+                Builders<TestDocument>.Update.Set(x => x.Name, "Updated"));
+
+            Assert.AreEqual(0L, result.MatchedCount);
+            Assert.AreEqual(0L, result.ModifiedCount);
+        }
+
+        [TestMethod]
+        public async Task UpdateAsync_WhenNoDocumentsMatch_ReturnsZeroCounts()
+        {
+            UpdateResult result = await _repository.UpdateAsync(
+                x => x.Name == "Missing",
+                Builders<TestDocument>.Update.Set(x => x.Name, "Updated"));
+
+            Assert.AreEqual(0L, result.MatchedCount);
+            Assert.AreEqual(0L, result.ModifiedCount);
+        }
+
+        [TestMethod]
+        public async Task AddManyAsync_ShouldEnumerateSingleUseInputOnlyOnce()
+        {
+            int enumerations = 0;
+
+            IEnumerable<TestDocument> GetDocuments()
+            {
+                enumerations++;
+                yield return new TestDocument { Name = "One" };
+                yield return new TestDocument { Name = "Two" };
+            }
+
+            IReadOnlyList<TestDocument> inserted = await _repository.AddAsync(GetDocuments());
+
+            Assert.AreEqual(1, enumerations);
+            Assert.AreEqual(2, inserted.Count);
+            Assert.AreEqual(2L, await _repository.CountAsync());
+        }
+
+        [TestMethod]
+        public async Task AllAsync_ShouldHonorCanceledCancellationToken()
+        {
+            using (CancellationTokenSource cancellation = new CancellationTokenSource())
+            {
+                cancellation.Cancel();
+                bool wasCanceled = false;
+
+                try
+                {
+                    await _repository.AllAsync(cancellation.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    wasCanceled = true;
+                }
+
+                Assert.IsTrue(wasCanceled);
+            }
+        }
+
+        [TestMethod]
         public void Query_ShouldExposeQueryableCollection()
         {
             _repository.Add(new[]
