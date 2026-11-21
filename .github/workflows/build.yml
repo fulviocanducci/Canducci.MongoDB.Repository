@@ -40,7 +40,14 @@ jobs:
         run: dotnet test Canducci.MongoDB.Repository.UnitTest/Canducci.MongoDB.Repository.UnitTest.csproj --configuration Release --no-restore
 
       - name: Pack NuGet package
-        run: dotnet pack Canducci.MongoDB.Repository/Canducci.MongoDB.Repository.csproj --configuration Release --no-build --output ./artifacts
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            package_version="${GITHUB_REF_NAME#v}"
+            dotnet pack Canducci.MongoDB.Repository/Canducci.MongoDB.Repository.csproj --configuration Release --no-build --output ./artifacts -p:Version="$package_version"
+          else
+            dotnet pack Canducci.MongoDB.Repository/Canducci.MongoDB.Repository.csproj --configuration Release --no-build --output ./artifacts
+          fi
 
       - name: Upload NuGet package
         uses: actions/upload-artifact@v4
@@ -77,4 +84,4 @@ jobs:
           user: canducci
 
       - name: Push package to NuGet
-        run: dotnet nuget push "artifacts/*.nupkg" --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push artifacts/*.nupkg --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
