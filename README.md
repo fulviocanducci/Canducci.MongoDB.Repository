@@ -34,24 +34,41 @@ Add the MongoDB settings to your `appsettings.json`:
 {
   "MongoDB": {
     "Database": "dbnew",
-    "ConnectionStrings": "mongodb://localhost:27017"
+    "ConnectionStrings": "mongodb://localhost:27017",
+    "Proxy": 0
   }
 }
 ```
 
-Register the repository using the application configuration:
+The `MongoDB:Proxy` setting controls automatic repository interface registration:
+
+- `0` (default): `Manual`. The library registers only the MongoDB client and connection. Register repository implementations yourself.
+- `1`: `Proxy`. The library also discovers and registers eligible empty repository interfaces automatically.
+
+Register using `IConfiguration`; the `Proxy` value is read from `appsettings.json`:
 
 ```csharp
 builder.Services.AddMongoDBRepository(builder.Configuration);
 ```
 
-Alternatively, provide the database name and connection string directly:
+You can also configure the registration explicitly through the action overload:
+
+```csharp
+services.AddMongoDBRepository(configuration =>
+{
+    configuration.Database = "dbnew";
+    configuration.ConnectionString = "mongodb://localhost:27017";
+    configuration.RegistrationMode = RepositoryRegistrationMode.Proxy;
+});
+```
+
+Or provide the database name and connection string directly. This overload uses `Manual` mode:
 
 ```csharp
 builder.Services.AddMongoDBRepository("dbnew", "mongodb://localhost:27017");
 ```
 
-Both overloads register a singleton `IMongoClient` and a singleton `IConnect`. The same MongoDB client instance is reused by the repository.
+All overloads register a singleton `IMongoClient` and a singleton `IConnect`. The same MongoDB client instance is reused by the repository.
 
 ## Model
 
@@ -93,7 +110,7 @@ public interface IRepositoryPerson : IRepository<Person>
 }
 ```
 
-The `AddMongoDBRepository` registration scans the assemblies already loaded by the application and automatically registers public, empty interfaces that directly inherit from one closed `IRepository<TEntity>` contract.
+When `RegistrationMode` is `Proxy` (or `MongoDB:Proxy` is `1`), the `AddMongoDBRepository` registration scans the assemblies already loaded by the application and automatically registers public, empty interfaces that directly inherit from one closed `IRepository<TEntity>` contract. In `Manual` mode, no repository interfaces are registered automatically.
 
 Inject the interface directly:
 

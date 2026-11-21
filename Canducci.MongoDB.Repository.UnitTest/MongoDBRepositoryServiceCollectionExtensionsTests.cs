@@ -18,7 +18,8 @@ namespace Canducci.MongoDB.Repository.UnitTest
             Dictionary<string, string> settings = new Dictionary<string, string>
             {
                 ["MongoDB:Database"] = "dbnew",
-                ["MongoDB:ConnectionStrings"] = "mongodb://localhost:27017"
+                ["MongoDB:ConnectionStrings"] = "mongodb://localhost:27017",
+                ["MongoDB:Proxy"] = "0"
             };
             IConfiguration configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(settings)
@@ -33,6 +34,7 @@ namespace Canducci.MongoDB.Repository.UnitTest
             Assert.AreSame(services, result);
             Assert.AreEqual(ServiceLifetime.Singleton, clientDescriptor.Lifetime);
             Assert.AreEqual(ServiceLifetime.Singleton, connectDescriptor.Lifetime);
+            Assert.IsNull(result.SingleOrDefault(service => service.ServiceType == typeof(IRepositoryProxyPerson)));
 
             using ServiceProvider provider = services.BuildServiceProvider();
             IMongoClient client = provider.GetRequiredService<IMongoClient>();
@@ -40,6 +42,46 @@ namespace Canducci.MongoDB.Repository.UnitTest
 
             Assert.IsNotNull(connect);
             Assert.AreSame(client, provider.GetRequiredService<IMongoClient>());
+        }
+
+        [TestMethod]
+        public void AddMongoDBRepository_WithConfigurationProxyEnabled_ShouldRegisterRepositoryProxy()
+        {
+            Dictionary<string, string> settings = new Dictionary<string, string>
+            {
+                ["MongoDB:Database"] = "dbnew",
+                ["MongoDB:ConnectionStrings"] = "mongodb://localhost:27017",
+                ["MongoDB:Proxy"] = "1"
+            };
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(settings)
+                .Build();
+            ServiceCollection services = new ServiceCollection();
+
+            services.AddMongoDBRepository(configuration);
+
+            ServiceDescriptor descriptor = services.SingleOrDefault(
+                service => service.ServiceType == typeof(IRepositoryProxyPerson));
+
+            Assert.IsNotNull(descriptor);
+            Assert.AreEqual(ServiceLifetime.Scoped, descriptor.Lifetime);
+        }
+
+        [TestMethod]
+        public void AddMongoDBRepository_WithInvalidProxyConfiguration_ShouldThrowInvalidOperationException()
+        {
+            Dictionary<string, string> settings = new Dictionary<string, string>
+            {
+                ["MongoDB:Database"] = "dbnew",
+                ["MongoDB:ConnectionStrings"] = "mongodb://localhost:27017",
+                ["MongoDB:Proxy"] = "2"
+            };
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(settings)
+                .Build();
+            ServiceCollection services = new ServiceCollection();
+
+            Assert.Throws<InvalidOperationException>(() => services.AddMongoDBRepository(configuration));
         }
 
         [TestMethod]
