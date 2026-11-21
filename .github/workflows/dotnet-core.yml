@@ -17,7 +17,11 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-      - name: Restore
+      - name: Restore library
+        run: dotnet restore Canducci.MongoDB.Repository/Canducci.MongoDB.Repository.csproj
+      - name: Build all library target frameworks
+        run: dotnet build Canducci.MongoDB.Repository/Canducci.MongoDB.Repository.csproj --configuration Release --no-restore
+      - name: Restore tests
         run: dotnet restore Canducci.MongoDB.Repository.UnitTest/Canducci.MongoDB.Repository.UnitTest.csproj
       - name: Test
         run: dotnet test Canducci.MongoDB.Repository.UnitTest/Canducci.MongoDB.Repository.UnitTest.csproj --configuration Release --no-restore
