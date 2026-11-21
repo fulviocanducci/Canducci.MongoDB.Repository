@@ -97,7 +97,7 @@ namespace Canducci.MongoDB.Repository
       public bool Edit<TKey>(TKey key, T model, CancellationToken cancellationToken = default)
       {
          return Collection
-             .ReplaceOne(GetFilterDefinition<TKey>(key), model, cancellationToken: cancellationToken)
+             .ReplaceOne(RepositoryUtil.GetFilterDefinition<T, TKey>(BsonIdName, key), model, cancellationToken: cancellationToken)
              .ModifiedCount > 0;
       }
       /// <summary>
@@ -110,7 +110,7 @@ namespace Canducci.MongoDB.Repository
       public async Task<bool> EditAsync<TKey>(TKey key, T model, CancellationToken cancellationToken = default)
       {
          ReplaceOneResult result = await Collection
-             .ReplaceOneAsync(GetFilterDefinition<TKey>(key), model, cancellationToken: cancellationToken);
+             .ReplaceOneAsync(RepositoryUtil.GetFilterDefinition<T, TKey>(BsonIdName, key), model, cancellationToken: cancellationToken);
          return result.ModifiedCount > 0;
       }
       /// <summary>
