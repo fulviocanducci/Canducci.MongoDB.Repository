@@ -263,18 +263,26 @@ namespace Canducci.MongoDB.Repository
       /// IEnumerable Documents
       /// </summary>
       /// <returns>IEnumerable Documents</returns>
-      public async Task<IEnumerable<T>> AllAsync()
+      public Task<IEnumerable<T>> AllAsync()
       {
-         return await Collection.Find(Builders<T>.Filter.Empty).ToListAsync();
+         return AllAsync(CancellationToken.None);
+      }
+      public async Task<IEnumerable<T>> AllAsync(CancellationToken cancellationToken)
+      {
+         return await Collection.Find(Builders<T>.Filter.Empty).ToListAsync(cancellationToken);
       }
       /// <summary>
       /// IEnumerable Documents
       /// </summary>
       /// <param name="filter">Parameter filter</param>
       /// <returns>IEnumerable Documents</returns>
-      public async Task<IEnumerable<T>> AllAsync(Expression<Func<T, bool>> filter)
+      public Task<IEnumerable<T>> AllAsync(Expression<Func<T, bool>> filter)
       {
-         return await Collection.Find(filter).ToListAsync();
+         return AllAsync(filter, CancellationToken.None);
+      }
+      public async Task<IEnumerable<T>> AllAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken)
+      {
+         return await Collection.Find(filter).ToListAsync(cancellationToken);
       }
       /// <summary>
       /// IEnumerable Documents
@@ -283,9 +291,13 @@ namespace Canducci.MongoDB.Repository
       /// <param name="filter">Parameter filter</param>
       /// <param name="orderBy">Parameter orderBy</param>
       /// <returns>IEnumerable Document</returns>
-      public async Task<IEnumerable<T>> AllAsync<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
+      public Task<IEnumerable<T>> AllAsync<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
       {
-         return await Collection.Find(filter).SortBy(orderBy).ToListAsync();
+         return AllAsync(filter, orderBy, CancellationToken.None);
+      }
+      public async Task<IEnumerable<T>> AllAsync<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy, CancellationToken cancellationToken)
+      {
+         return await Collection.Find(filter).SortBy(orderBy).ToListAsync(cancellationToken);
       }
       #endregion
 
@@ -311,12 +323,16 @@ namespace Canducci.MongoDB.Repository
       /// <param name="orderBy">Parameter orderBy</param>
       /// <param name="filter">`Parameter filter</param>
       /// <returns>List documents</returns>
-      public async Task<IEnumerable<T>> ListAsync<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null)
+      public Task<IEnumerable<T>> ListAsync<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null)
+      {
+         return ListAsync(orderBy, filter, CancellationToken.None);
+      }
+      public async Task<IEnumerable<T>> ListAsync<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter, CancellationToken cancellationToken)
       {
          IFindFluent<T, T> query = filter != null
              ? Collection.Find(filter)
              : Collection.Find(Builders<T>.Filter.Empty);
-         return await query.SortBy(orderBy).ToListAsync();
+         return await query.SortBy(orderBy).ToListAsync(cancellationToken);
       }
       #endregion
 
@@ -433,9 +449,13 @@ namespace Canducci.MongoDB.Repository
       /// <param name="pageNumber">Page number</param>
       /// <param name="pageSize">Page size</param>
       /// <returns>IPagedList</returns>
-      public async Task<IPagedList<T>> PagedListAsync(int pageNumber, int pageSize)
+      public Task<IPagedList<T>> PagedListAsync(int pageNumber, int pageSize)
       {
-         return await CreatePagedListAsync(Builders<T>.Filter.Empty, null, pageNumber, pageSize);
+         return PagedListAsync(pageNumber, pageSize, CancellationToken.None);
+      }
+      public async Task<IPagedList<T>> PagedListAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
+      {
+         return await CreatePagedListAsync(Builders<T>.Filter.Empty, null, pageNumber, pageSize, cancellationToken);
       }
       /// <summary>
       /// Paging documents
@@ -456,13 +476,18 @@ namespace Canducci.MongoDB.Repository
       /// <param name="pageSize">Page size</param>
       /// <param name="orderBy">Parameter orderBy</param>
       /// <returns>IPagedList</returns>
-      public async Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy)
+      public Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy)
+      {
+         return PagedListAsync(pageNumber, pageSize, orderBy, CancellationToken.None);
+      }
+      public async Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy, CancellationToken cancellationToken)
       {
          return await CreatePagedListAsync(
              Builders<T>.Filter.Empty,
              Builders<T>.Sort.Ascending(orderBy),
              pageNumber,
-             pageSize);
+             pageSize,
+             cancellationToken);
       }
       /// <summary>
       /// Paging documents
@@ -486,19 +511,25 @@ namespace Canducci.MongoDB.Repository
       /// <param name="filter">Parameter filter</param>
       /// <param name="orderBy">Parameter orderBy</param>
       /// <returns>IPagedList</returns>
-      public async Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
+      public Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
+      {
+         return PagedListAsync(pageNumber, pageSize, filter, orderBy, CancellationToken.None);
+      }
+      public async Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy, CancellationToken cancellationToken)
       {
          return await CreatePagedListAsync(
              Builders<T>.Filter.Where(filter),
              Builders<T>.Sort.Ascending(orderBy),
              pageNumber,
-             pageSize);
+             pageSize,
+             cancellationToken);
       }
       private async Task<IPagedList<T>> CreatePagedListAsync(
           FilterDefinition<T> filter,
           SortDefinition<T> sort,
           int pageNumber,
-          int pageSize)
+          int pageSize,
+          CancellationToken cancellationToken)
       {
          if (pageNumber < 1)
          {
@@ -509,7 +540,7 @@ namespace Canducci.MongoDB.Repository
             throw new ArgumentOutOfRangeException(nameof(pageSize), pageSize, "PageSize cannot be less than 1.");
          }
 
-         long totalItemCount = await Collection.CountDocumentsAsync(filter);
+         long totalItemCount = await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
          IFindFluent<T, T> query = Collection.Find(filter);
          if (sort != null)
          {
@@ -519,7 +550,7 @@ namespace Canducci.MongoDB.Repository
          List<T> items = await query
              .Skip((pageNumber - 1) * pageSize)
              .Limit(pageSize)
-             .ToListAsync();
+             .ToListAsync(cancellationToken);
 
          return new PagedList<T>(items, pageNumber, pageSize, checked((int)totalItemCount));
       }
