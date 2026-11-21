@@ -13,7 +13,7 @@ namespace WebAPI
          // 
          builder.Services.AddControllers();
          builder.Services.AddOpenApi();
-         builder.Services.AddScoped<IConnect, Connect>(_ => new Connect(configuration));
+         builder.Services.AddSingleton<IConnect, Connect>(_ => new Connect(configuration));
          builder.Services.AddScoped<PeopleRepositoryAbstract, PeopleRepository>();
          builder.Services.Configure<RouteOptions>(configuration =>
          {
