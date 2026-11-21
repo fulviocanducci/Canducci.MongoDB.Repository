@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Canducci.Pagination.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Canducci.MongoDB.Repository.UnitTest
