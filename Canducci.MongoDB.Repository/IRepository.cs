@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Canducci.MongoDB.Repository
 {
-   public interface IRepository<T>
+   public interface IRepository<T> where T : class, new()
    {
       #region IMongoColledction
       IMongoCollection<T> Collection { get; }
@@ -18,9 +18,9 @@ namespace Canducci.MongoDB.Repository
 
       #region Add
       T Add(T model, CancellationToken cancellationToken = default);
-      IEnumerable<T> Add(IEnumerable<T> models, CancellationToken cancellationToken = default);
+      IReadOnlyList<T> Add(IEnumerable<T> models, CancellationToken cancellationToken = default);
       Task<T> AddAsync(T model, CancellationToken cancellationToken = default);
-      Task<IEnumerable<T>> AddAsync(IEnumerable<T> models, CancellationToken cancellationToken = default);
+      Task<IReadOnlyList<T>> AddAsync(IEnumerable<T> models, CancellationToken cancellationToken = default);
       #endregion
 
       #region Edit
@@ -31,10 +31,10 @@ namespace Canducci.MongoDB.Repository
       #endregion
 
       #region Update
-      bool Update(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default);
-      bool UpdateAll(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default);
-      Task<bool> UpdateAsync(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default);
-      Task<bool> UpdateAllAsync(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default);
+      UpdateResult Update(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default);
+      UpdateResult UpdateAll(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default);
+      Task<UpdateResult> UpdateAsync(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default);
+      Task<UpdateResult> UpdateAllAsync(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default);
       #endregion
 
       #region Find
@@ -45,17 +45,17 @@ namespace Canducci.MongoDB.Repository
       #endregion
 
       #region All
-      IEnumerable<T> All();
-      IEnumerable<T> All(Expression<Func<T, bool>> filter);
-      IEnumerable<T> All<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy);
-      Task<IEnumerable<T>> AllAsync();
-      Task<IEnumerable<T>> AllAsync(Expression<Func<T, bool>> filter);
-      Task<IEnumerable<T>> AllAsync<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy);
+      IReadOnlyList<T> All();
+      IReadOnlyList<T> All(Expression<Func<T, bool>> filter);
+      IReadOnlyList<T> All<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy);
+      Task<IReadOnlyList<T>> AllAsync(CancellationToken cancellationToken = default);
+      Task<IReadOnlyList<T>> AllAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken = default);
+      Task<IReadOnlyList<T>> AllAsync<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy, CancellationToken cancellationToken = default);
       #endregion
 
       #region List
-      IEnumerable<T> List<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null);
-      Task<IEnumerable<T>> ListAsync<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null);
+      IReadOnlyList<T> List<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null);
+      Task<IReadOnlyList<T>> ListAsync<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null, CancellationToken cancellationToken = default);
       #endregion
 
       #region Delete
