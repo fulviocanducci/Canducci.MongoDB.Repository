@@ -23,10 +23,15 @@ namespace Canducci.MongoDB.Repository.UnitTest
     public class RepositoryDispatchProxyTests
     {
         [TestMethod]
-        public void AddMongoDBRepository_ShouldRegisterEmptyRepositoryInterfaceAsScopedProxy()
+        public void AddMongoDBRepository_WithProxyMode_ShouldRegisterEmptyRepositoryInterfaceAsScopedProxy()
         {
             ServiceCollection services = new ServiceCollection();
-            services.AddMongoDBRepository("dbnew", "mongodb://localhost:27017");
+            services.AddMongoDBRepository(configuration =>
+            {
+                configuration.Database = "dbnew";
+                configuration.ConnectionString = "mongodb://localhost:27017";
+                configuration.RegistrationMode = RepositoryRegistrationMode.Proxy;
+            });
 
             ServiceDescriptor descriptor = services.SingleOrDefault(
                 service => service.ServiceType == typeof(IRepositoryProxyPerson));
@@ -47,10 +52,15 @@ namespace Canducci.MongoDB.Repository.UnitTest
         }
 
         [TestMethod]
-        public void AddMongoDBRepository_ShouldNotRegisterRepositoryInterfaceWithCustomMethods()
+        public void AddMongoDBRepository_WithProxyMode_ShouldNotRegisterRepositoryInterfaceWithCustomMethods()
         {
             ServiceCollection services = new ServiceCollection();
-            services.AddMongoDBRepository("dbnew", "mongodb://localhost:27017");
+            services.AddMongoDBRepository(configuration =>
+            {
+                configuration.Database = "dbnew";
+                configuration.ConnectionString = "mongodb://localhost:27017";
+                configuration.RegistrationMode = RepositoryRegistrationMode.Proxy;
+            });
 
             using ServiceProvider provider = services.BuildServiceProvider();
             using IServiceScope scope = provider.CreateScope();
@@ -59,6 +69,18 @@ namespace Canducci.MongoDB.Repository.UnitTest
                 scope.ServiceProvider.GetService<IRepositoryProxyPersonWithCustomMethod>();
 
             Assert.IsNull(repository);
+        }
+
+        [TestMethod]
+        public void AddMongoDBRepository_WithDefaultManualMode_ShouldNotRegisterRepositoryInterface()
+        {
+            ServiceCollection services = new ServiceCollection();
+            services.AddMongoDBRepository("dbnew", "mongodb://localhost:27017");
+
+            ServiceDescriptor descriptor = services.SingleOrDefault(
+                service => service.ServiceType == typeof(IRepositoryProxyPerson));
+
+            Assert.IsNull(descriptor);
         }
     }
 }
