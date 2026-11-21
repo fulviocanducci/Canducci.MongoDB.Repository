@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Canducci.MongoDB.Repository
 {
-    public sealed class PagedList<T> : PaginatedBase<T>
+    public sealed class PagedList<T> : PaginatedBase<T>, IPaginated<T>
     {
         public PagedList(IEnumerable<T> subset, int pageNumber, int pageSize, int totalItemCount)
             : base(subset ?? Enumerable.Empty<T>())
@@ -40,6 +40,11 @@ namespace Canducci.MongoDB.Repository
                 : lastItemOnPage;
 
             SetPages();
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }
