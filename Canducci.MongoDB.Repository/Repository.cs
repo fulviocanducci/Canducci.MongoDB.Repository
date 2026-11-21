@@ -265,8 +265,7 @@ namespace Canducci.MongoDB.Repository
       /// <returns>IEnumerable Documents</returns>
       public async Task<IEnumerable<T>> AllAsync()
       {
-         return await Task.FromResult(Collection.AsQueryable().AsEnumerable());
-
+         return await Collection.Find(Builders<T>.Filter.Empty).ToListAsync();
       }
       /// <summary>
       /// IEnumerable Documents
@@ -275,7 +274,7 @@ namespace Canducci.MongoDB.Repository
       /// <returns>IEnumerable Documents</returns>
       public async Task<IEnumerable<T>> AllAsync(Expression<Func<T, bool>> filter)
       {
-         return await Task.FromResult(Collection.AsQueryable().Where(filter).AsEnumerable());
+         return await Collection.Find(filter).ToListAsync();
       }
       /// <summary>
       /// IEnumerable Documents
@@ -286,7 +285,7 @@ namespace Canducci.MongoDB.Repository
       /// <returns>IEnumerable Document</returns>
       public async Task<IEnumerable<T>> AllAsync<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
       {
-         return await Task.FromResult(Collection.AsQueryable().Where(filter).OrderBy(orderBy).AsEnumerable());
+         return await Collection.Find(filter).SortBy(orderBy).ToListAsync();
       }
       #endregion
 
@@ -314,10 +313,10 @@ namespace Canducci.MongoDB.Repository
       /// <returns>List documents</returns>
       public async Task<IEnumerable<T>> ListAsync<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null)
       {
-         IQueryable<T> query = Collection.AsQueryable();
-         return (filter != null)
-             ? await Task.FromResult(query.Where(filter).OrderBy(orderBy).AsEnumerable())
-             : await Task.FromResult(query.OrderBy(orderBy).AsEnumerable());
+         IFindFluent<T, T> query = filter != null
+             ? Collection.Find(filter)
+             : Collection.Find(Builders<T>.Filter.Empty);
+         return await query.SortBy(orderBy).ToListAsync();
       }
       #endregion
 
@@ -436,7 +435,7 @@ namespace Canducci.MongoDB.Repository
       /// <returns>IPagedList</returns>
       public async Task<IPagedList<T>> PagedListAsync(int pageNumber, int pageSize)
       {
-         return await Task.FromResult(PagedList(pageNumber, pageSize));
+         return await CreatePagedListAsync(Builders<T>.Filter.Empty, null, pageNumber, pageSize);
       }
       /// <summary>
       /// Paging documents
@@ -459,7 +458,11 @@ namespace Canducci.MongoDB.Repository
       /// <returns>IPagedList</returns>
       public async Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy)
       {
-         return await Task.FromResult(PagedList<Tkey>(pageNumber, pageSize, orderBy));
+         return await CreatePagedListAsync(
+             Builders<T>.Filter.Empty,
+             Builders<T>.Sort.Ascending(orderBy),
+             pageNumber,
+             pageSize);
       }
       /// <summary>
       /// Paging documents
@@ -485,8 +488,42 @@ namespace Canducci.MongoDB.Repository
       /// <returns>IPagedList</returns>
       public async Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy)
       {
-         return await Task.FromResult(PagedList<Tkey>(pageNumber, pageSize, filter, orderBy));
+         return await CreatePagedListAsync(
+             Builders<T>.Filter.Where(filter),
+             Builders<T>.Sort.Ascending(orderBy),
+             pageNumber,
+             pageSize);
       }
+      private async Task<IPagedList<T>> CreatePagedListAsync(
+          FilterDefinition<T> filter,
+          SortDefinition<T> sort,
+          int pageNumber,
+          int pageSize)
+      {
+         if (pageNumber < 1)
+         {
+            throw new ArgumentOutOfRangeException(nameof(pageNumber), pageNumber, "PageNumber cannot be below 1.");
+         }
+         if (pageSize < 1)
+         {
+            throw new ArgumentOutOfRangeException(nameof(pageSize), pageSize, "PageSize cannot be less than 1.");
+         }
+
+         long totalItemCount = await Collection.CountDocumentsAsync(filter);
+         IFindFluent<T, T> query = Collection.Find(filter);
+         if (sort != null)
+         {
+            query = query.Sort(sort);
+         }
+
+         List<T> items = await query
+             .Skip((pageNumber - 1) * pageSize)
+             .Limit(pageSize)
+             .ToListAsync();
+
+         return new PagedList<T>(items, pageNumber, pageSize, checked((int)totalItemCount));
+      }
+
       #endregion
 
       #region objectId
