@@ -13,24 +13,29 @@ namespace Canducci.MongoDB.Repository.UnitTest
     [TestClass]
     public class RepositoryContractTests
     {
-        private MongoDbRunner _runner;
+        private static MongoDbRunner _runner;
         private IMongoCollection<TestDocument> _collection;
         private TestRepository _repository;
+
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext context)
+        {
+            _runner = MongoDbRunner.Start();
+        }
+
+        [ClassCleanup]
+        public static void ClassCleanup()
+        {
+            _runner?.Dispose();
+        }
 
         [TestInitialize]
         public void Initialize()
         {
-            _runner = MongoDbRunner.Start();
             MongoClient client = new MongoClient(_runner.ConnectionString);
             IMongoDatabase database = client.GetDatabase("RepositoryContractTests");
             _collection = database.GetCollection<TestDocument>(Guid.NewGuid().ToString("N"));
             _repository = new TestRepository(_collection);
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            _runner?.Dispose();
         }
 
         [TestMethod]
