@@ -261,7 +261,7 @@ In your Razor View:
 ```cshtml
 @using Canducci.Pagination.Mvc
 @using Canducci.Pagination.Interfaces
-@model Canducci.MongoDB.Repository.Paged.IPaginated<WebApp.Models.Person>
+@model IPaginated<WebApp.Models.Person>
 
 @Html.Pagination(
     Model,
