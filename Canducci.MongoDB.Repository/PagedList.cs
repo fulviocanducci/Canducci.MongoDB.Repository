@@ -1,4 +1,5 @@
 using Canducci.Pagination.Bases;
+using Canducci.Pagination.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
