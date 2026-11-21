@@ -49,17 +49,13 @@ namespace Canducci.MongoDB.Repository
       IEnumerable<T> All(Expression<Func<T, bool>> filter);
       IEnumerable<T> All<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy);
       Task<IEnumerable<T>> AllAsync();
-      Task<IEnumerable<T>> AllAsync(CancellationToken cancellationToken);
       Task<IEnumerable<T>> AllAsync(Expression<Func<T, bool>> filter);
-      Task<IEnumerable<T>> AllAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken);
       Task<IEnumerable<T>> AllAsync<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy);
-      Task<IEnumerable<T>> AllAsync<Tkey>(Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy, CancellationToken cancellationToken);
       #endregion
 
       #region List
       IEnumerable<T> List<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null);
       Task<IEnumerable<T>> ListAsync<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter = null);
-      Task<IEnumerable<T>> ListAsync<Tkey>(Expression<Func<T, Tkey>> orderBy, Expression<Func<T, bool>> filter, CancellationToken cancellationToken);
       #endregion
 
       #region Delete
@@ -76,13 +72,10 @@ namespace Canducci.MongoDB.Repository
       #region IPagedList
       IPagedList<T> PagedList(int pageNumber, int pageSize);
       Task<IPagedList<T>> PagedListAsync(int pageNumber, int pageSize);
-      Task<IPagedList<T>> PagedListAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
       IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy);
       Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy);
-      Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy, CancellationToken cancellationToken);
       IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy);
       Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy);
-      Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy, CancellationToken cancellationToken);
       #endregion
 
       #region CreateObjectId
