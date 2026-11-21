@@ -1,4 +1,4 @@
-﻿using Canducci.MongoDB.Repository.Paged;
+﻿using Canducci.Pagination.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
@@ -69,13 +69,13 @@ namespace Canducci.MongoDB.Repository
       IQueryable<T> Query();
       #endregion
 
-      #region IPagedList
-      IPagedList<T> PagedList(int pageNumber, int pageSize);
-      Task<IPagedList<T>> PagedListAsync(int pageNumber, int pageSize);
-      IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy);
-      Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy);
-      IPagedList<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy);
-      Task<IPagedList<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy);
+      #region Pagination
+      IPaginated<T> PagedList(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+      Task<IPaginated<T>> PagedListAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+      IPaginated<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy, CancellationToken cancellationToken = default);
+      Task<IPaginated<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, Tkey>> orderBy, CancellationToken cancellationToken = default);
+      IPaginated<T> PagedList<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy, CancellationToken cancellationToken = default);
+      Task<IPaginated<T>> PagedListAsync<Tkey>(int pageNumber, int pageSize, Expression<Func<T, bool>> filter, Expression<Func<T, Tkey>> orderBy, CancellationToken cancellationToken = default);
       #endregion
 
       #region CreateObjectId
