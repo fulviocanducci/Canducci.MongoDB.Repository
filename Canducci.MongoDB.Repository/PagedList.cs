@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Canducci.MongoDB.Repository
 {
-    public sealed class PagedList<T> : PaginatedBase<T>, IPaginated<T>
+    public class PagedList<T> : PaginatedBase<T>, IPaginated<T>
     {
         public PagedList(IEnumerable<T> subset, int pageNumber, int pageSize, int totalItemCount)
             : base(subset ?? Enumerable.Empty<T>())
