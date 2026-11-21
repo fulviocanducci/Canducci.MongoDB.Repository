@@ -175,6 +175,60 @@ namespace Canducci.MongoDB.Repository.UnitTest
             Assert.AreEqual(2, _repository.Count());
         }
 
+        [TestMethod]
+        public void Edit_WithFilter_WhenDocumentMatchesButReplacementIsUnchanged_ReturnsTrue()
+        {
+            TestDocument document = _repository.Add(new TestDocument { Name = "Fulvio" });
+
+            bool result = _repository.Edit(x => x.Id == document.Id, new TestDocument { Id = document.Id, Name = document.Name });
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public async Task EditAsync_WithKey_WhenDocumentMatchesButReplacementIsUnchanged_ReturnsTrue()
+        {
+            TestDocument document = _repository.Add(new TestDocument { Name = "Fulvio" });
+
+            bool result = await _repository.EditAsync(document.Id, new TestDocument { Id = document.Id, Name = document.Name });
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void Edit_WhenNoDocumentMatches_ReturnsFalse()
+        {
+            bool result = _repository.Edit(x => x.Name == "Missing", new TestDocument { Name = "Replacement" });
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void Update_WhenDocumentMatchesButValueIsUnchanged_PreservesMatchedAndModifiedCounts()
+        {
+            TestDocument document = _repository.Add(new TestDocument { Name = "Same" });
+
+            UpdateResult result = _repository.Update(
+                x => x.Id == document.Id,
+                Builders<TestDocument>.Update.Set(x => x.Name, "Same"));
+
+            Assert.AreEqual(1L, result.MatchedCount);
+            Assert.AreEqual(0L, result.ModifiedCount);
+        }
+
+        [TestMethod]
+        public async Task AddManyAsync_MaterializesInputAndReturnsReadOnlyList()
+        {
+            IReadOnlyList<TestDocument> inserted = await _repository.AddAsync(new[]
+            {
+                new TestDocument { Name = "One" },
+                new TestDocument { Name = "Two" }
+            });
+
+            Assert.AreEqual(2, inserted.Count);
+            Assert.AreEqual(2, _repository.Count());
+        }
+
         private sealed class TestRepository : Repository<TestDocument>
         {
             public TestRepository(IMongoCollection<TestDocument> collection)
@@ -203,7 +257,7 @@ namespace Canducci.MongoDB.Repository.UnitTest
             }
         }
 
-        private sealed class TestDocument
+        public sealed class TestDocument
         {
             public ObjectId Id { get; set; }
             public string Name { get; set; }

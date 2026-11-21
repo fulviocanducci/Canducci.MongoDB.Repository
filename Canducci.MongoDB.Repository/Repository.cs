@@ -148,7 +148,7 @@ namespace Canducci.MongoDB.Repository
       /// </summary>
       /// <param name="filter">Parameter filter</param>
       /// <param name="update">Base class for updates</param>
-      /// <returns>bool</returns>
+      /// <returns>UpdateResult</returns>
       public UpdateResult Update(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default)
       {
          return Collection.UpdateOne(filter, update, cancellationToken: cancellationToken);
@@ -158,7 +158,7 @@ namespace Canducci.MongoDB.Repository
       /// </summary>
       /// <param name="filter">Parameter filter</param>
       /// <param name="update">Base class for updates</param>
-      /// <returns>bool</returns>
+      /// <returns>UpdateResult</returns>
       public UpdateResult UpdateAll(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default)
       {
          return Collection.UpdateMany(filter, update, cancellationToken: cancellationToken);
@@ -168,7 +168,7 @@ namespace Canducci.MongoDB.Repository
       /// </summary>
       /// <param name="filter">Parameter filter</param>
       /// <param name="update">Base class for updates</param>
-      /// <returns>bool</returns>
+      /// <returns>UpdateResult</returns>
       public async Task<UpdateResult> UpdateAsync(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default)
       {
          return await Collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
@@ -178,7 +178,7 @@ namespace Canducci.MongoDB.Repository
       /// </summary>
       /// <param name="filter">Parameter filter</param>
       /// <param name="update">Base class for updates</param>
-      /// <returns>bool</returns>
+      /// <returns>UpdateResult</returns>
       public async Task<UpdateResult> UpdateAllAsync(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default)
       {
          return await Collection.UpdateManyAsync(filter, update, cancellationToken: cancellationToken);
@@ -304,7 +304,7 @@ namespace Canducci.MongoDB.Repository
          IQueryable<T> query = Collection.AsQueryable();
          return (filter != null)
              ? query.Where(filter).OrderBy(orderBy).ToList()
-             : query.OrderBy(orderBy).AsEnumerable();
+             : query.OrderBy(orderBy).ToList();
       }
       /// <summary>
       /// List documents
