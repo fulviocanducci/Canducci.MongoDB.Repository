@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
 
 namespace Canducci.MongoDB.Repository
@@ -54,7 +57,63 @@ namespace Canducci.MongoDB.Repository
             services.AddSingleton<IConnect>(provider =>
                 new Connect(provider.GetRequiredService<IMongoClient>(), database));
 
+            RegisterRepositoryInterfaces(services);
+
             return services;
+        }
+
+        private static void RegisterRepositoryInterfaces(IServiceCollection services)
+        {
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (Type interfaceType in GetLoadableTypes(assembly))
+                {
+                    if (!interfaceType.IsInterface || interfaceType.IsGenericTypeDefinition || !interfaceType.IsVisible)
+                    {
+                        continue;
+                    }
+
+                    Type[] inheritedInterfaces = interfaceType.GetInterfaces();
+                    if (inheritedInterfaces.Length != 1 || !inheritedInterfaces[0].IsGenericType)
+                    {
+                        continue;
+                    }
+
+                    if (inheritedInterfaces[0].GetGenericTypeDefinition() != typeof(IRepository<>))
+                    {
+                        continue;
+                    }
+
+                    if (interfaceType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Length != 0)
+                    {
+                        continue;
+                    }
+
+                    Type entityType = inheritedInterfaces[0].GetGenericArguments()[0];
+
+                    services.TryAddScoped(interfaceType, provider =>
+                        RepositoryDispatchProxyFactory.Create(
+                            interfaceType,
+                            entityType,
+                            provider.GetRequiredService<IConnect>()));
+                }
+            }
+        }
+
+        private static Type[] GetLoadableTypes(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException exception)
+            {
+                return exception.Types.Where(type => type != null).ToArray();
+            }
+            catch (NotSupportedException)
+            {
+                return Array.Empty<Type>();
+            }
         }
     }
 }
