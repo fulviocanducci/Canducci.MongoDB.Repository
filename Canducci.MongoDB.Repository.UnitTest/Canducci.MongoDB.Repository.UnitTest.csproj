@@ -15,6 +15,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.32" />
     <PackageReference Include="Canducci.Pagination" Version="3.3.0" />
+    <PackageReference Include="Mongo2Go" Version="3.1.3" />
   </ItemGroup>
 
   <ItemGroup>

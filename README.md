@@ -271,3 +271,19 @@ In your Razor View:
 ```
 
 The MVC package provides the pagination styles and HTML rendering. The MongoDB repository remains independent of ASP.NET Core MVC and continues to execute paged queries through the MongoDB driver.
+
+
+#### Repository operation contracts (4.0.0)
+
+Collection-returning methods now return materialized `IReadOnlyList<T>` results. This applies to `Add(IEnumerable<T>)`, `AddAsync(IEnumerable<T>)`, `All`, `AllAsync`, `List` and `ListAsync`. The returned collection is a stable snapshot and does not execute a deferred MongoDB query when enumerated.
+
+Update methods return the MongoDB driver's `UpdateResult` instead of a boolean:
+
+- `Update` / `UpdateAsync`: update one matching document.
+- `UpdateAll` / `UpdateAllAsync`: update all matching documents.
+
+Use `MatchedCount` to inspect how many documents matched, `ModifiedCount` to inspect how many documents changed, `IsAcknowledged` to inspect write acknowledgement, and `UpsertedId` when an upsert created a document.
+
+`Edit` and `EditAsync` return `true` when a document matched the replacement filter, even if the replacement content was identical and MongoDB reports no modified documents.
+
+All asynchronous collection-reading methods accept an optional `CancellationToken`.
