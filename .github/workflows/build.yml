@@ -1,0 +1,87 @@
+name: Build and Publish
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build, test and pack
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore library
+        run: dotnet restore Canducci.MongoDB.Repository/Canducci.MongoDB.Repository.csproj
+
+      - name: Build library
+        run: dotnet build Canducci.MongoDB.Repository/Canducci.MongoDB.Repository.csproj --configuration Release --no-restore
+
+      - name: Restore tests
+        run: dotnet restore Canducci.MongoDB.Repository.UnitTest/Canducci.MongoDB.Repository.UnitTest.csproj
+
+      - name: Run tests
+        run: dotnet test Canducci.MongoDB.Repository.UnitTest/Canducci.MongoDB.Repository.UnitTest.csproj --configuration Release --no-restore
+
+      - name: Pack NuGet package
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            package_version="${GITHUB_REF_NAME#v}"
+            dotnet pack Canducci.MongoDB.Repository/Canducci.MongoDB.Repository.csproj --configuration Release --no-build --output ./artifacts -p:Version="$package_version"
+          else
+            dotnet pack Canducci.MongoDB.Repository/Canducci.MongoDB.Repository.csproj --configuration Release --no-build --output ./artifacts
+          fi
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: artifacts/*.nupkg
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish to NuGet
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download NuGet package
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-package
+          path: artifacts
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Authenticate with NuGet Trusted Publishing
+        uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: canducci
+
+      - name: Push package to NuGet
+        run: dotnet nuget push artifacts/*.nupkg --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
