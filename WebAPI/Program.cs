@@ -1,5 +1,6 @@
 
 using Canducci.MongoDB.Repository;
+using Canducci.MongoDB.Repository.Extensions;
 using WebAPI.Repositories;
 
 namespace WebAPI
