@@ -77,6 +77,20 @@ namespace Canducci.MongoDB.Repository.UnitTest
         }
 
         [TestMethod]
+        public void QueryableConstructor_ShouldInitializePageNumbers()
+        {
+            List<string> items = new List<string>
+            {
+                "item-1", "item-2", "item-3", "item-4", "item-5"
+            };
+
+            PagedList<string> pagedList = new PagedList<string>(items.AsQueryable(), 2, 2);
+
+            Assert.AreEqual(3, pagedList.PageCount);
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, new List<int>(pagedList.Pages));
+        }
+
+        [TestMethod]
         public void Constructor_ShouldRejectInvalidPageNumber()
         {
             Assert.ThrowsException<ArgumentOutOfRangeException>(
