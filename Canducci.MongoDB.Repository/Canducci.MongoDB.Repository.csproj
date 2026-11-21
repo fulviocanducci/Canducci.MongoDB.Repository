@@ -1,47 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-   <PropertyGroup>
-      <TargetFrameworks>netstandard2.0;netstandard2.1;</TargetFrameworks>
-      <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-      <Authors>fulviocanducci</Authors>
-      <PackageLicenseExpression>MIT</PackageLicenseExpression>
-      <PackageProjectUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</PackageProjectUrl>
-      <RepositoryUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</RepositoryUrl>
-      <RepositoryType>git</RepositoryType>
-      <PackageTags>repository mongodb pagination</PackageTags>
-      <PackageReleaseNotes>Use Canducci.Pagination as the pagination contract and base implementation</PackageReleaseNotes>
-      <PackageIcon>mongo.png</PackageIcon>
-      <Description>MongoDB repository with asynchronous operations and Canducci pagination support</Description>
-      <Version>4.0.0</Version>
-      <PackageReadmeFile>README.md</PackageReadmeFile>
-      <AssemblyVersion>4.0.0</AssemblyVersion>
-      <FileVersion>4.0.0</FileVersion>
-   </PropertyGroup>
-   <ItemGroup>
-      <PackageReference Include="Canducci.Pagination" Version="3.3.0" />
-   </ItemGroup>
-   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-      <PackageReference Include="Microsoft.Extensions.Configuration">
-         <Version>3.1.32</Version>
-      </PackageReference>
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.32" />
-      <PackageReference Include="MongoDB.Driver" Version="2.30.0" />
-   </ItemGroup>
-   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-      <PackageReference Include="Microsoft.Extensions.Configuration">
-         <Version>3.1.32</Version>
-      </PackageReference>
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.32" />
-      <PackageReference Include="MongoDB.Driver" Version="3.1.0" />
-   </ItemGroup>
-   <ItemGroup>
-      <None Include="..\images\mongo.png">
-         <Pack>True</Pack>
-         <PackagePath></PackagePath>
-      </None>
-      <None Include="..\README.md">
-         <Pack>True</Pack>
-         <PackagePath>\</PackagePath>
-      </None>
-   </ItemGroup>
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net10.0</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>fulviocanducci</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/fulviocanducci/Canducci.MongoDB.Repository</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>repository mongodb pagination</PackageTags>
+    <PackageReleaseNotes>Use Canducci.Pagination as the pagination contract and base implementation</PackageReleaseNotes>
+    <PackageIcon>mongo.png</PackageIcon>
+    <Description>MongoDB repository with asynchronous operations and Canducci pagination support</Description>
+    <Version>4.0.0</Version>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <AssemblyVersion>4.0.0</AssemblyVersion>
+    <FileVersion>4.0.0</FileVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Canducci.Pagination" Version="3.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.15" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.15" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="MongoDB.Driver" Version="2.30.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="MongoDB.Driver" Version="3.14.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\images\mongo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 </Project>
