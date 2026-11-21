@@ -214,7 +214,7 @@ namespace Canducci.MongoDB.Repository
       /// <returns>Document</returns>
       public async Task<T> FindAsync<TKey>(TKey key, CancellationToken cancellationToken = default)
       {
-         IAsyncCursor<T> result = await Collection.FindAsync(RepositoryUtil.GetFilterDefinition<T, TKey>(BsonIdName, key));
+         IAsyncCursor<T> result = await Collection.FindAsync(RepositoryUtil.GetFilterDefinition<T, TKey>(BsonIdName, key), cancellationToken: cancellationToken);
          return await result.FirstOrDefaultAsync(cancellationToken);
       }
       /// <summary>
