@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Canducci.MongoDB.Repository.Paged;
 using Canducci.Pagination.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
