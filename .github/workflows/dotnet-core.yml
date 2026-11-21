@@ -1,18 +1,23 @@
-  
-name: .NET Core
+name: .NET
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v1
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.100
-    - name: Build with dotnet
-      run: dotnet test -c Release -f netcoreapp3.1
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Restore
+        run: dotnet restore Canducci.MongoDB.Repository.UnitTest/Canducci.MongoDB.Repository.UnitTest.csproj
+      - name: Test
+        run: dotnet test Canducci.MongoDB.Repository.UnitTest/Canducci.MongoDB.Repository.UnitTest.csproj --configuration Release --no-restore
