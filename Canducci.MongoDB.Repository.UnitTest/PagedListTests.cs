@@ -91,21 +91,21 @@ namespace Canducci.MongoDB.Repository.UnitTest
         [TestMethod]
         public void Constructor_ShouldRejectInvalidPageNumber()
         {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(
+            Assert.Throws<ArgumentOutOfRangeException>(
                 () => new PagedList<string>(new List<string>(), 0, 10, 0));
         }
 
         [TestMethod]
         public void Constructor_ShouldRejectInvalidPageSize()
         {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(
+            Assert.Throws<ArgumentOutOfRangeException>(
                 () => new PagedList<string>(new List<string>(), 1, 0, 0));
         }
 
         [TestMethod]
         public void Constructor_ShouldRejectNegativeTotalItemCount()
         {
-            Assert.ThrowsException<ArgumentOutOfRangeException>(
+            Assert.Throws<ArgumentOutOfRangeException>(
                 () => new PagedList<string>(new List<string>(), 1, 10, -1));
         }
     }
