@@ -1,3 +1,4 @@
+
 name: Build and Publish
 
 on:
@@ -65,6 +66,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+
     steps:
       - name: Download NuGet package
         uses: actions/download-artifact@v4
