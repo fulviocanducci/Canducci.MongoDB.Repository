@@ -463,7 +463,6 @@ public async Task<IActionResult> Index(int? page)
     </tbody>
 </table>
 
-<p>Page @Model.PageNumber of @Model.TotalPages</p>
 ```
 
 ### Canducci.Pagination.Mvc integration
@@ -970,7 +969,6 @@ public async Task<IActionResult> Index(int? page)
     </tbody>
 </table>
 
-<p>Página @Model.PageNumber de @Model.TotalPages</p>
 ```
 
 ### Integração com Canducci.Pagination.Mvc
