@@ -1,3 +1,5 @@
+using Canducci.MongoDB.Repository.Interfaces;
+
 namespace Canducci.MongoDB.Repository
 {
     public interface IRepository<T> :
