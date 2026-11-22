@@ -16,7 +16,8 @@ namespace Web11
                 config.RegistrationMode = RepositoryRegistrationMode.Proxy;
             });
             builder.Services.AddControllersWithViews();
-            var app = builder.Build();
+
+            WebApplication app = builder.Build();
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
