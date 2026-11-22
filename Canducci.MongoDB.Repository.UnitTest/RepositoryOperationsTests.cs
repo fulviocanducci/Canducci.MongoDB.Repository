@@ -184,6 +184,71 @@ namespace Canducci.MongoDB.Repository.UnitTest
         }
 
         [TestMethod]
+        public void FindBy_ShouldApplyMongoFilterAndSort()
+        {
+            SeedDocuments();
+
+            FilterDefinition<TestDocument> filter = Builders<TestDocument>.Filter.Eq(x => x.Category, "A");
+            SortDefinition<TestDocument> sort = Builders<TestDocument>.Sort.Ascending(x => x.Name);
+
+            IReadOnlyList<TestDocument> result = _repository.FindBy(filter, sort);
+
+            Assert.AreEqual(3, result.Count);
+            Assert.AreEqual("Alpha", result[0].Name);
+            Assert.AreEqual("Charlie", result[1].Name);
+            Assert.AreEqual("Echo", result[2].Name);
+        }
+
+        [TestMethod]
+        public async Task FindByAsync_ShouldApplyMongoFilterAndSort()
+        {
+            SeedDocuments();
+
+            FilterDefinition<TestDocument> filter = Builders<TestDocument>.Filter.Eq(x => x.Category, "B");
+            SortDefinition<TestDocument> sort = Builders<TestDocument>.Sort.Descending(x => x.Name);
+
+            IReadOnlyList<TestDocument> result = await _repository.FindByAsync(filter, sort);
+
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual("Delta", result[0].Name);
+            Assert.AreEqual("Bravo", result[1].Name);
+        }
+
+        [TestMethod]
+        public void FindAll_ShouldReturnAllDocumentsInMongoSortOrder()
+        {
+            SeedDocuments();
+
+            SortDefinition<TestDocument> sort = Builders<TestDocument>.Sort.Descending(x => x.Name);
+
+            IReadOnlyList<TestDocument> result = _repository.FindAll(sort);
+
+            Assert.AreEqual(5, result.Count);
+            Assert.AreEqual("Echo", result[0].Name);
+            Assert.AreEqual("Delta", result[1].Name);
+            Assert.AreEqual("Charlie", result[2].Name);
+            Assert.AreEqual("Bravo", result[3].Name);
+            Assert.AreEqual("Alpha", result[4].Name);
+        }
+
+        [TestMethod]
+        public async Task FindAllAsync_ShouldReturnAllDocumentsInMongoSortOrder()
+        {
+            SeedDocuments();
+
+            SortDefinition<TestDocument> sort = Builders<TestDocument>.Sort.Ascending(x => x.Name);
+
+            IReadOnlyList<TestDocument> result = await _repository.FindAllAsync(sort);
+
+            Assert.AreEqual(5, result.Count);
+            Assert.AreEqual("Alpha", result[0].Name);
+            Assert.AreEqual("Bravo", result[1].Name);
+            Assert.AreEqual("Charlie", result[2].Name);
+            Assert.AreEqual("Delta", result[3].Name);
+            Assert.AreEqual("Echo", result[4].Name);
+        }
+
+        [TestMethod]
         public void Update_WhenNoDocumentsMatch_ReturnsZeroCounts()
         {
             UpdateResult result = _repository.Update(

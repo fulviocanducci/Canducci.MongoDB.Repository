@@ -9,6 +9,8 @@ namespace Canducci.MongoDB.Repository
         IRepositoryUpdate<T>,
         IRepositoryFind<T>,
         IRepositoryAll<T>,
+        IRepositoryFindBy<T>,
+        IRepositoryFindAll<T>,
         IRepositoryList<T>,
         IRepositoryDelete<T>,
         IRepositoryQueryable<T>,
