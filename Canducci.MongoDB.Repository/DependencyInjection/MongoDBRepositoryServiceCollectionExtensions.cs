@@ -10,9 +10,7 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
 {
     public static class MongoDBRepositoryServiceCollectionExtensions
     {
-        public static IServiceCollection AddMongoDBRepository(
-            this IServiceCollection services,
-            IConfiguration configuration)
+        public static IServiceCollection AddMongoDBRepository(this IServiceCollection services, IConfiguration configuration)
         {
             if (services is null)
             {
@@ -44,9 +42,7 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
             return AddMongoDBRepository(services, database, connectionString, registrationMode);
         }
 
-        public static IServiceCollection AddMongoDBRepository(
-            this IServiceCollection services,
-            Action<MongoDBRepositoryConfiguration> configure)
+        public static IServiceCollection AddMongoDBRepository(this IServiceCollection services, Action<MongoDBRepositoryConfiguration> configure)
         {
             if (services is null)
             {

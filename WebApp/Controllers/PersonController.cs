@@ -15,11 +15,11 @@ namespace WebApp.Controllers
             Repository = repository;
         }
 
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index(int? current)
         {
-            int total = 5;
-            IPaginated<Person> data = await Repository
-                .PagedListAsync(page ?? 1, total, w => w.Id != null && w.Name != null, x => x.Name);
+            int total = 2;
+            current ??= 1;
+            IPaginated<Person> data = await Repository.PagedListAsync(current.Value, total, w => w.Id != null && w.Name != null, x => x.Name);
             return View(data);
         }
 

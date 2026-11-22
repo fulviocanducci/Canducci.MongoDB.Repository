@@ -1,5 +1,4 @@
-using Canducci.MongoDB.Repository;
-using Canducci.MongoDB.Repository.Extensions;
+using Canducci.MongoDB.Repository.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

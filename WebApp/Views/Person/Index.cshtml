@@ -1,5 +1,4 @@
-﻿@using Canducci.Pagination.Interfaces
-@model IPaginated<WebApp.Models.Person>
+﻿@model IPaginated<WebApp.Models.Person>
 
 @{
   ViewData["Title"] = "Index";
@@ -41,17 +40,16 @@
 }
   </tbody>
 </table>
-<div class="row">
-  <div class="col-md-5 text-right">
-    @if (Model.HasPreviousPage)
-    {
-      <a href="/Person?page=@(Model.PageNumber - 1)">voltar</a>
-    }
-  </div>
-  <div class="col-md-5 text-left">
-    @if (Model.HasNextPage)
-    {
-      <a href="/Person?page=@(Model.PageNumber + 1)">avançar</a>
-    }
-  </div>
+<div>
+    <pagination pagination-asp-action="Index"
+                pagination-asp-controller="Person"
+                pagination-style="PreviousNext"
+                pagination-css-class-ul="pagination"
+                pagination-paginated="Model"
+                pagination-label-next="Next"
+                pagination-label-previous="Previous"
+                pagination-css-class-anchor="page-link"
+                pagination-css-class-li="page-item"
+                pagination-css-class-li-disabled="disabled">
+    </pagination>
 </div>
