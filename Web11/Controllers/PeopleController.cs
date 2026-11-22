@@ -12,6 +12,7 @@ namespace Web11.Controllers
         {
             current ??= 1;
             var data = await repository.PagedListAsync(current.Value, 5, o => o.Name, cancellationToken);
+
             return View(data);
         }
 
