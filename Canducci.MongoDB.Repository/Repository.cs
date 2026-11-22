@@ -291,7 +291,53 @@ namespace Canducci.MongoDB.Repository
       }
       #endregion
 
-      #region list
+            #region FindBy
+      /// <summary>
+      /// Finds documents matching the specified filter and applies the specified sort.
+      /// </summary>
+      public IReadOnlyList<T> FindBy(
+         FilterDefinition<T> filter,
+         SortDefinition<T> sort,
+         CancellationToken cancellationToken = default)
+      {
+         return Collection.Find(filter).Sort(sort).ToList(cancellationToken);
+      }
+
+      /// <summary>
+      /// Finds documents matching the specified filter and applies the specified sort asynchronously.
+      /// </summary>
+      public async Task<IReadOnlyList<T>> FindByAsync(
+         FilterDefinition<T> filter,
+         SortDefinition<T> sort,
+         CancellationToken cancellationToken = default)
+      {
+         return await Collection.Find(filter).Sort(sort).ToListAsync(cancellationToken);
+      }
+      #endregion
+
+      #region FindAll
+      /// <summary>
+      /// Finds all documents and applies the specified sort.
+      /// </summary>
+      public IReadOnlyList<T> FindAll(
+         SortDefinition<T> sort,
+         CancellationToken cancellationToken = default)
+      {
+         return Collection.Find(Builders<T>.Filter.Empty).Sort(sort).ToList(cancellationToken);
+      }
+
+      /// <summary>
+      /// Finds all documents and applies the specified sort asynchronously.
+      /// </summary>
+      public async Task<IReadOnlyList<T>> FindAllAsync(
+         SortDefinition<T> sort,
+         CancellationToken cancellationToken = default)
+      {
+         return await Collection.Find(Builders<T>.Filter.Empty).Sort(sort).ToListAsync(cancellationToken);
+      }
+      #endregion
+
+#region list
       /// <summary>
       /// List documents
       /// </summary>
