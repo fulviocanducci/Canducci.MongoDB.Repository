@@ -291,7 +291,7 @@ namespace Canducci.MongoDB.Repository
       }
       #endregion
 
-            #region FindBy
+      #region FindBy
       /// <summary>
       /// Finds documents matching the specified filter and applies the specified sort.
       /// </summary>
@@ -337,7 +337,7 @@ namespace Canducci.MongoDB.Repository
       }
       #endregion
 
-#region list
+      #region list
       /// <summary>
       /// List documents
       /// </summary>
