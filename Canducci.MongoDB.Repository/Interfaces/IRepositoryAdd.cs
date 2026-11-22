@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Canducci.MongoDB.Repository
+namespace Canducci.MongoDB.Repository.Interfaces
 {
     public interface IRepositoryAdd<T> where T : class, new()
     {
