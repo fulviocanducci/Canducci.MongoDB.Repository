@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Canducci.MongoDB.Repository
+namespace Canducci.MongoDB.Repository.Interfaces
 {
     public interface IRepositoryList<T> where T : class, new()
     {
