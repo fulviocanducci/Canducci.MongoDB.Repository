@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -26,6 +27,9 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
                 throw new ArgumentNullException(nameof(configuration));
             }
 
+            Assembly callingAssembly = Assembly.GetCallingAssembly();
+            Assembly stackCallerAssembly = GetFirstExternalAssembly();
+
             IConfigurationSection section = configuration.GetSection("MongoDB");
             string database = section["Database"];
             string connectionString = section["ConnectionStrings"];
@@ -43,8 +47,14 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
                 registrationMode = (RepositoryRegistrationMode)proxy;
             }
 
-            Assembly callingAssembly = Assembly.GetCallingAssembly();
-            return AddMongoDBRepository(services, database, connectionString, registrationMode, callingAssembly);
+            return AddMongoDBRepository(
+                services,
+                database,
+                connectionString,
+                registrationMode,
+                callingAssembly,
+                stackCallerAssembly,
+                null);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -62,6 +72,10 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
                 throw new ArgumentNullException(nameof(configure));
             }
 
+            Assembly callingAssembly = Assembly.GetCallingAssembly();
+            Assembly stackCallerAssembly = GetFirstExternalAssembly();
+            Assembly configureAssembly = configure.Method.Module.Assembly;
+
             MongoDBRepositoryConfiguration configuration = new MongoDBRepositoryConfiguration();
             configure(configuration);
 
@@ -72,13 +86,14 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
                     "Registration mode must be Manual (0) or Proxy (1).");
             }
 
-            Assembly callingAssembly = Assembly.GetCallingAssembly();
             return AddMongoDBRepository(
                 services,
                 configuration.Database,
                 configuration.ConnectionString,
                 configuration.RegistrationMode,
-                callingAssembly);
+                callingAssembly,
+                stackCallerAssembly,
+                configureAssembly);
         }
 
         public static IServiceCollection AddMongoDBRepository(
@@ -91,7 +106,9 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
                 database,
                 connectionString,
                 RepositoryRegistrationMode.Manual,
-                typeof(MongoDBRepositoryServiceCollectionExtensions).Assembly);
+                typeof(MongoDBRepositoryServiceCollectionExtensions).Assembly,
+                null,
+                null);
         }
 
         private static IServiceCollection AddMongoDBRepository(
@@ -99,7 +116,7 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
             string database,
             string connectionString,
             RepositoryRegistrationMode registrationMode,
-            Assembly callingAssembly)
+            params Assembly[] consumerAssemblies)
         {
             if (services is null)
             {
@@ -129,16 +146,18 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
 
             if (registrationMode == RepositoryRegistrationMode.Proxy)
             {
-                RegisterRepositoryInterfaces(services, callingAssembly);
+                RegisterRepositoryInterfaces(services, consumerAssemblies);
             }
 
             return services;
         }
 
-        private static void RegisterRepositoryInterfaces(IServiceCollection services, Assembly callingAssembly)
+        private static void RegisterRepositoryInterfaces(
+            IServiceCollection services,
+            Assembly[] consumerAssemblies)
         {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                .Concat(new[] { callingAssembly })
+                .Concat(consumerAssemblies ?? Array.Empty<Assembly>())
                 .Where(assembly => assembly != null)
                 .Distinct()
                 .ToArray();
@@ -172,6 +191,30 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
                             provider.GetRequiredService<IConnect>()));
                 }
             }
+        }
+
+        private static Assembly GetFirstExternalAssembly()
+        {
+            Assembly extensionAssembly = typeof(MongoDBRepositoryServiceCollectionExtensions).Assembly;
+            StackFrame[] frames = new StackTrace().GetFrames();
+
+            if (frames is null)
+            {
+                return null;
+            }
+
+            foreach (StackFrame frame in frames)
+            {
+                MethodBase method = frame.GetMethod();
+                Assembly assembly = method?.DeclaringType?.Assembly ?? method?.Module?.Assembly;
+
+                if (assembly != null && assembly != extensionAssembly)
+                {
+                    return assembly;
+                }
+            }
+
+            return null;
         }
 
         private static Type GetRepositoryInterface(Type interfaceType)
