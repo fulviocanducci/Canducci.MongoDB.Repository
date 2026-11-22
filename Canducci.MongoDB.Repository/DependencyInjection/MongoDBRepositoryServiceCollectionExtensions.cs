@@ -139,6 +139,7 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
         {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies()
                 .Concat(new[] { callingAssembly })
+                .Where(assembly => assembly != null)
                 .Distinct()
                 .ToArray();
 
@@ -151,11 +152,7 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
                         continue;
                     }
 
-                    Type repositoryInterface = interfaceType.GetInterfaces()
-                        .FirstOrDefault(inheritedInterface =>
-                            inheritedInterface.IsGenericType &&
-                            inheritedInterface.GetGenericTypeDefinition() == typeof(IRepository<>));
-
+                    Type repositoryInterface = GetRepositoryInterface(interfaceType);
                     if (repositoryInterface is null)
                     {
                         continue;
@@ -175,6 +172,19 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
                             provider.GetRequiredService<IConnect>()));
                 }
             }
+        }
+
+        private static Type GetRepositoryInterface(Type interfaceType)
+        {
+            string repositoryInterfaceName = typeof(IRepository<>).FullName;
+
+            return interfaceType.GetInterfaces()
+                .FirstOrDefault(inheritedInterface =>
+                    inheritedInterface.IsGenericType &&
+                    string.Equals(
+                        inheritedInterface.GetGenericTypeDefinition().FullName,
+                        repositoryInterfaceName,
+                        StringComparison.Ordinal));
         }
 
         private static Type[] GetLoadableTypes(Assembly assembly)
