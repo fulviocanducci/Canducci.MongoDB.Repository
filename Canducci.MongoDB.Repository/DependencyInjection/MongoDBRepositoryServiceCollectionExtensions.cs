@@ -138,13 +138,15 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
                         continue;
                     }
 
-                    Type[] inheritedInterfaces = interfaceType.GetInterfaces();
-                    if (inheritedInterfaces.Length != 1 || !inheritedInterfaces[0].IsGenericType)
-                    {
-                        continue;
-                    }
+                    Type repositoryInterface = interfaceType.GetInterfaces()
+                        .FirstOrDefault(inheritedInterface =>
+                            inheritedInterface.IsGenericType &&
+                            string.Equals(
+                                inheritedInterface.GetGenericTypeDefinition().FullName,
+                                typeof(IRepository<>).FullName,
+                                StringComparison.Ordinal));
 
-                    if (inheritedInterfaces[0].GetGenericTypeDefinition() != typeof(IRepository<>))
+                    if (repositoryInterface is null)
                     {
                         continue;
                     }
@@ -154,7 +156,7 @@ namespace Canducci.MongoDB.Repository.DependencyInjection
                         continue;
                     }
 
-                    Type entityType = inheritedInterfaces[0].GetGenericArguments()[0];
+                    Type entityType = repositoryInterface.GetGenericArguments()[0];
 
                     services.TryAddScoped(interfaceType, provider =>
                         RepositoryDispatchProxyFactory.Create(
