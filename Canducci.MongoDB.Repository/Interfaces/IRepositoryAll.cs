@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
@@ -9,11 +10,11 @@ namespace Canducci.MongoDB.Repository
     {
         #region All
         IReadOnlyList<T> All();
-        IReadOnlyList<T> All(Expression<System.Func<T, bool>> filter);
-        IReadOnlyList<T> All<Tkey>(Expression<System.Func<T, bool>> filter, Expression<System.Func<T, Tkey>> orderBy);
+        IReadOnlyList<T> All(Expression<Func<T, bool>> filter);
+        IReadOnlyList<T> All<TKey>(Expression<Func<T, bool>> filter, Expression<Func<T, TKey>> orderBy);
         Task<IReadOnlyList<T>> AllAsync(CancellationToken cancellationToken = default);
-        Task<IReadOnlyList<T>> AllAsync(Expression<System.Func<T, bool>> filter, CancellationToken cancellationToken = default);
-        Task<IReadOnlyList<T>> AllAsync<Tkey>(Expression<System.Func<T, bool>> filter, Expression<System.Func<T, Tkey>> orderBy, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<T>> AllAsync(Expression<Func<T, bool>> filter, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<T>> AllAsync<TKey>(Expression<Func<T, bool>> filter, Expression<Func<T, TKey>> orderBy, CancellationToken cancellationToken = default);
         #endregion
     }
 }
